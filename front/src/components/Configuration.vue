@@ -5,85 +5,80 @@
                 <button v-on:click="() => { dialog = !dialog; editMenu = false }"
                     class="text-white hover:text-slate-200 transition-all float-right" variant="text" icon=""
                     size="large">
-                    <span class="icon-[material-symbols--settings] size-8"></span>
+                    <span class="icon-[tdesign--user] size-8"></span>
                 </button>
                 <div v-if="dialog" key="1" activator="top-right-svg">
                     <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
-                    <div class="relative bg-white rounded-xl shadow-xl pt-8 pb-6 px-4 z-50 top-10">
-                        <div class="rounded-xl flex border border-slate-200 mt-5 py-3 px-1 w-fit ml-auto">
-                            <div class="absolute top-0 right-0">
-                                <button
-                                    class="mr-5 mt-5 border-slate-200 border rounded-md size-5 flex items-center justify-center"
-                                    v-on:click="dialog = !dialog"><span
-                                        class="icon-[material-symbols--close]"></span></button>
-                            </div>
+                    <div class="relative bg-white rounded-xl shadow-xl p-6 z-50 top-10 w-80">
+                        <div class="absolute top-0 right-0">
+                            <button
+                                class="mr-5 mt-5 rounded-md size-5 flex items-center justify-center hover:text-slate-500 transition"
+                                v-on:click="dialog = !dialog"><span
+                                    class="icon-[material-symbols--close] size-5"></span></button>
+                        </div>
+                        <div className="flex flex-col items-center w-full">
                             <div class="flex items-center justify-center mx-3 ">
                                 <img :src="getAvatarUrl(avatar)" alt="Avatar"
                                     class="size-20 rounded-full bg-red-100 border-slate-300 border">
                             </div>
-                            <div class="flex flex-col justify-center mx-3">
-                                <h1 class="text-gray-700">{{ name }} {{ surname }}</h1>
-                                <p class="text-gray-400">{{ email }}</p>
+                            <div className="mt-2 text-center">
+                                <p className="text-lg font-semibold">{{ name }} {{ surname }}</p>
+                                <p className="text-sm text-gray-600">{{ email }}</p>
                             </div>
-                            <div class="flex flex-col items-center justify-center mx-3">
-                                <button
-                                    class="bg-blue-500 text-white hover:bg-blue-600 rounded-md mb-1 size-7 flex items-center justify-center"
-                                    @click="() => { editMenu = !editMenu }">
-                                    <span class="icon-[tdesign--edit-2] size-5"></span>
-                                </button>
+                            <div className="flex mt-3">
                                 <a href="/"
-                                    class="bg-red-500 text-white hover:bg-red-600 rounded-md size-7 flex items-center justify-center"
+                                    class="bg-red-400 hover:bg-red-500 text-white rounded-md mr-1 w-12 h-9 flex items-center justify-center transition"
                                     @click="logout()">
-                                    <span class="icon-[material-symbols--logout] size-5"></span>
+                                    <span class="icon-[tdesign--logout] size-6"></span>
                                 </a>
+                                <button
+                                    class="bg-blue-400 hover:bg-blue-500 text-white rounded-md w-12 h-9 flex items-center justify-center transition"
+                                    @click="() => { editMenu = !editMenu }">
+                                    <span class="icon-[tdesign--edit-2] size-6"></span>
+                                </button>
                             </div>
                         </div>
-                        <div v-show="editMenu" class="rounded-xl flex border border-slate-200 mt-5 py-3 px-1">
+                        <div v-show="editMenu" class="rounded-xl flex mt-5 py-3 px-1">
                             <div class="container">
-                                <div class="flex p-2">
-                                    <p><b>Nom:</b></p>
-                                    <div type="name" class="ml-2" variant="solo">{{ name }}</div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700"
+                                        htmlFor="name">Nom:</label>
+                                    <input type="text" class="border border-slate-300 rounded-md p-1 px-3 w-full mt-1"
+                                        v-model="name"></input>
                                 </div>
-                                <div class="flex p-2">
-                                    <p><b>Cognom:</b></p>
-                                    <div type="name" class="ml-2" variant="solo">{{ surname }}
-                                    </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700"
+                                        htmlFor="name">Correu:</label>
+                                    <input type="text" class="border border-slate-300 rounded-md p-1 px-3 w-full mt-1"
+                                        v-model="email"></input>
                                 </div>
-                                <div class="flex p-2">
-                                    <p><b>Correu:</b></p>
-                                    <div type="name" class="ml-2" variant="solo">{{ email }}
-                                    </div>
+                                <label className="block text-sm font-medium text-gray-700" htmlFor="name">Canviar
+                                    contrasenya:</label>
+                                <div class="flex mt-2 items-center">
+                                    <input v-model="password1" :type="show1 ? 'text' : 'password'" name="password1"
+                                        placeholder="Contrassenya"
+                                        class="border border-slate-300 rounded-md p-1 px-3 w-full mr-2" />
+                                    <button @click="show1 = !show1"
+                                        class="bg-blue-400 hover:bg-blue-500 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center p-1">
+                                        <span class="icon-[mdi--eye] size-4 text-white"
+                                            :class="!show1 ? 'icon-[mdi--eye]' : 'icon-[mdi--eye-off]'"></span>
+                                    </button>
                                 </div>
-                                <div class="p-4 w-fit rounded-xl border border-slate-200 mx-auto my-3">
-                                    <p><b>Cambiar Contraseña</b></p>
-                                    <div class="flex mt-2">
-                                        <input v-model="password1" :type="show1 ? 'text' : 'password'" name="password1"
-                                            placeholder="Contrassenya"
-                                            class="border border-gray-300 rounded-md mr-2 pl-2" />
-                                        <button @click="show1 = !show1"
-                                            class="bg-blue-500 hover:bg-blue-700 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center size-6">
-                                            <span class="icon-[mdi--eye] size-4 text-white"
-                                                :class="!show1 ? 'icon-[mdi--eye]' : 'icon-[mdi--eye-off]'"></span>
-                                        </button>
-                                    </div>
-                                    <div class="flex mt-1">
-                                        <input v-model="password2" :type="show2 ? 'text' : 'password'" name="password2"
-                                            placeholder="Confirmar contrassenya"
-                                            class="border border-gray-300 rounded-md mr-2 pl-2" />
-                                        <button @click="show2 = !show2"
-                                            class="bg-blue-500 hover:bg-blue-700 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center size-6">
-                                            <span class="size-4 text-white"
-                                                :class="!show2 ? 'icon-[mdi--eye]' : 'icon-[mdi--eye-off]'"></span>
-                                        </button>
-                                    </div>
-                                    <div class="mt-3 flex justify-between">
-                                        <button
-                                            class="bg-red-500 hover:bg-red-700 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center py-1 px-2 text-white ml-3"
-                                            @click="() => { editMenu = false }">Cancelar</button>
-                                        <button
-                                            class="bg-blue-500 hover:bg-blue-700 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center py-1 px-2 text-white mr-3"
-                                            @click="checkPassword()">Guardar</button>
-                                    </div>
+                                <div class="flex mt-1 items-center">
+                                    <input v-model="password2" :type="show2 ? 'text' : 'password'" name="password2"
+                                        placeholder="Confirmar contrassenya"
+                                        class="border border-slate-300 rounded-md p-1 px-3 w-full mr-2" />
+                                    <button @click="show2 = !show2"
+                                        class="bg-blue-400 hover:bg-blue-500 transition-colors duration-300 ease-in-out rounded-md flex items-center justify-center p-1">
+                                        <span class="size-4 text-white"
+                                            :class="!show2 ? 'icon-[mdi--eye]' : 'icon-[mdi--eye-off]'"></span>
+                                    </button>
+                                </div>
+                                <div class="mt-3 flex justify-between">
+                                    <button class="button-pop-up bg-red-400 hover:bg-red-500 mr-3"
+                                        @click="() => { editMenu = false }">CANCELAR</button>
+                                    <button class="button-pop-up bg-blue-400 hover:bg-blue-500"
+                                        @click="checkPassword()">GUARDAR</button>
                                 </div>
                             </div>
                         </div>
@@ -282,5 +277,9 @@ export default {
 
 .div-gear {
     position: relative;
+}
+
+.button-pop-up {
+    @apply text-white rounded-md py-3 px-6 w-full transition-all font-bold shadow-md shadow-black/30;
 }
 </style>

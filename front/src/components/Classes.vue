@@ -12,7 +12,7 @@ import {
   getDificultatsFetch,
 } from "../services/communicationManager";
 import { socket } from "../services/socket";
-// import AddDifficulty from "../components/AddDifficulty.vue";
+import AddDifficulty from "../components/AddDifficulty.vue";
 
 export default {
   data() {
@@ -42,9 +42,9 @@ export default {
       errors: []
     };
   },
-  // components: {
-  //   AddDifficulty,
-  // },
+  components: {
+    AddDifficulty,
+  },
   methods: {
     async getClasses() {
       const response = await getClassesFetch(this.idProfe);
@@ -93,7 +93,7 @@ export default {
     createSala(id) {
       socket.emit("createSala", id, getState().usuari.id);
       setState({ usuari: { classe: id } });
-      this.$router.push("/sala");
+      window.location.href = "/sala"
     },
     async eliminarClasse() {
       const response = await deleteClasse(this.classeEditar);
@@ -127,14 +127,13 @@ export default {
       });
     },
     checkDefaultDifficulty(selectedDificultat, classeId) {
-      const isDefaultDifficulty = selectedDificultat == "Crear dificultat";
+      const isDefaultDifficulty = selectedDificultat.nomDificultat == "Crear dificultat";
 
       if (isDefaultDifficulty) {
         this.showDefaultDifficultyDialog[classeId] = true;
         this.mostrarCrearDificultat = true;
       }
     },
-
     cancelarCrearDificultat() {
       if (this.mostrarCrearDificultat) {
         this.mostrarCrearDificultat = false;
@@ -191,8 +190,9 @@ export default {
   <div class="h-screen bg-[radial-gradient(rgba(173,216,230)_30%,rgba(81,180,213)_100%)]">
     <div class="flex justify-start p-4 pl-12">
       <button variant="tonal" icon="mdi-arrow-left" class="mt-5" @click="$router.push('/join')"></button>
-      <button class="my-button" prepend-icon="mdi-plus" @click="mostrarPopUp = !mostrarPopUp">Crear
-        classe
+      <button
+        class="mt-4 py-2 rounded-lg bg-white text-[#72bae8] font-bold flex justify-start p-4 px-10 transition-all shadow-md shadow-black/20"
+        prepend-icon="mdi-plus" @click="mostrarPopUp = !mostrarPopUp">CREAR CLASSE
       </button>
     </div>
     <div v-show="mostrarPopUp" key="1">
@@ -224,7 +224,7 @@ export default {
     </div>
     <div class="mt-12 p-12 grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-5">
       <div v-for="classe in classes" :key="classe.idClasse" class="rounded-lg bg-white shadow-lg overflow-hidden">
-        <div class="relative z-10 px-6 py-4 bg-white">
+        <div class="relative z-0 px-6 py-4 bg-white">
           <div class="absolute inset-0 w-full object-cover classe h-24 z-0">
             <div class="h-24 ml-8 flex items-center">
               <h1 class="text-black text-2xl font-bold h-fit">{{ classe.nomClasse }}</h1>
@@ -234,7 +234,7 @@ export default {
             <button
               class="absolute bg-white hover:bg-slate-200 transition-all rounded-full size-10 flex items-center justify-center top-4 right-4 "
               @click="setClasseEditar(classe)">
-              <span class="icon-[material-symbols--edit-square-outline] size-5"></span>
+              <span class="icon-[tdesign--edit-2] size-5"></span>
             </button>
             <div class="mt-2">
               <span
@@ -242,11 +242,64 @@ export default {
                 {{ classe.numeroUsuarios }}
                 <span class="icon-[heroicons--users-16-solid] size-4 ml-1"></span>
               </span>
-              <button class="my-button bg-blue-500 text-white rounded-full px-4 py-2"
-                @click="createSala(classe.idClasse)">
-                Comienza
-              </button>
+              <div class="flex">
+                <button class="button-pop-up bg-[#72bae8] text-white rounded-full p-2 mt-4 h-fit"
+                  @click="createSala(classe.idClasse)">
+                  COMENÇA
+                </button>
+                <div class="flex items-center justify-center">
+                  <div class="p-4">
+                    <select v-model="selectedDificultats[classe.idClasse]"
+                      class="border border-gray-300 rounded p-2 w-full"
+                      @change="checkDefaultDifficulty(selectedDificultats[classe.idClasse], classe.idClasse)">
+                      <option disabled value="">Seleccione un elemento</option>
+                      <option v-for="dificultat in dificultats" :key="dificultat.id" :value="dificultat">
+                        {{ dificultat.nomDificultat }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="mostrarCrearDificultat">
+      <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
+      <div class="absolute w-full h-full flex items-center justify-center top-0">
+        <div class="relative bg-white rounded-xl shadow-xl py-8 px-6 z-50">
+          <div class="bg-white rounded p-4">
+            <h2 class="text-center text-3xl font-bold mb-4">
+              Crea una nova dificultat
+            </h2>
+            <form @submit.prevent="saveDifficulty">
+              <div class="mb-4">
+                <label class="block text-lg font-bold mb-2">
+                  Nom de la nova dificultat
+                </label>
+                <input type="text" v-model="nuevaDificultatNombre"
+                  class="border border-gray-300 rounded px-4 py-2 w-full" required />
+              </div>
+              <h3 class="text-center text-2xl font-bold mb-4">
+                Afegir dificultats
+              </h3>
+              <div class="flex justify-center mb-4">
+                <AddDifficulty v-for="index in 3" :key="index" :dificultat="index - 1" @afegirDificultat="
+        afegirDificultats[index - 1] = $event
+        " />
+              </div>
+              <div class="flex justify-between">
+                <button type="submit"
+                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">
+                  Desa
+                </button>
+                <button type="button" @click="cancelarCrearDificultat"
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                  Cancela
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -310,14 +363,6 @@ export default {
 
 .full-container {
   background-color: lightblue;
-}
-
-.my-button {
-  margin-top: 10px;
-  padding: auto;
-  border-radius: 4px;
-  background-color: #72bae8;
-  color: white;
 }
 
 .button-pop-up {

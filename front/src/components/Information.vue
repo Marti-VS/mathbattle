@@ -1,10 +1,10 @@
 <template>
     <div class="div-gear">
-        <div class="absolute top-0 right-0 mt-8 md:mr-[90px] mr-12">
+        <div class="absolute top-0 right-0 mt-8 md:mr-[100px] mr-14">
             <div>
                 <button v-on:click="dialog = !dialog" class="text-white hover:text-slate-200 transition-all float-right"
                     variant="text" icon="" size="large">
-                    <span class="icon-[mdi--information-outline] size-8"></span>
+                    <span class="icon-[tdesign--info-circle] size-8"></span>
                 </button>
                 <div v-show="dialog" activator="info-svg">
                     <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>

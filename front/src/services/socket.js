@@ -2,7 +2,7 @@ import io from "socket.io-client";
 import { reactive } from "vue";
 import _ from 'lodash';
 
-export const socket = io(import.meta.env.VITE_NODE_ROUTE);
+export const socket = io(import.meta.env.PUBLIC_NODE);
 let num = 0;
 
 export const state = reactive({

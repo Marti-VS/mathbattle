@@ -204,7 +204,7 @@ export default {
         </form>
 
         <div class="text-center mt-3 font-bold">
-          <a href="/chooseClass" class="text-blue-500 hover:underline">Crea una sala</a>
+          <a href="/class" class="text-blue-500 hover:underline">Crea una sala</a>
         </div>
       </div>
     </div>
