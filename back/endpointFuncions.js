@@ -182,36 +182,38 @@ function getUserById(id) {
 function login(email, password) {
   return new Promise((resolve, reject) => {
     if (!email || !password) {
-      reject({ err: "Both email and password are required" });
+      reject({ err: "Tant correu com la contrasenya són necessaris." });
     } else {
       let sql = `SELECT * FROM USUARIS WHERE correu = '${email}'`;
 
       conn.query(sql, (err, result) => {
-        if (err) console.error(err);
-        let ciphertext = CryptoJS.MD5(password).toString();
-        if (result == 0 || result[0].pass != ciphertext) {
-          reject({ err: "Wrong email or password" });
-        } else {
-          //req.session.user = result[0].CorreoElectronico;
-          // res.cookie("user", req.session.user, { signed: true });
-          //res.send({ cookie: req.session, userData: result[0] });
-          resolve({ userData: result[0] });
+        if (err) {
+          console.error(err);
+          reject({ err: "Hi han problemes en la base de dades, prova-ho mes tard." });
+          return; // Termina la ejecución para evitar errores adicionales
         }
+
+        if (result.length === 0 || result[0].pass !== CryptoJS.MD5(password).toString()) {
+          reject({ err: "La contrasenya i/o el correu electrònic no són correctes." });
+          return; // Termina la ejecución para evitar errores adicionales
+        }
+
+        // En este punto, la autenticación es exitosa
+        resolve({ userData: result[0] });
       });
     }
   });
 }
 
-function register(email, password, nom, cognom) {
+function register(email, password, nom) {
   return new Promise((resolve, reject) => {
-    if (!email || !password || !nom || !cognom) {
+    if (!email || !password || !nom) {
       reject({ err: "All elements are required" });
     } else {
       const newUser = {
         nom: nom,
         pass: CryptoJS.MD5(password).toString(),
         correu: email,
-        cognom: cognom,
       };
       let sql = `INSERT INTO USUARIS SET ?`;
       conn.query(sql, newUser, (err, result) => {

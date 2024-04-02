@@ -20,7 +20,8 @@ export function register(emailRegistration) {
   });
 }
 
-export function login(usernameLogin) {
+export function login(loginData) {
+  console.log(loginData);
   return new Promise((resolve, reject) => {
     fetch(NODE + "/login", {
       method: "POST",
@@ -28,8 +29,8 @@ export function login(usernameLogin) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: usernameLogin.email,
-        password: usernameLogin.password,
+        email: loginData.email,
+        password: loginData.password,
       }),
     })
       .then((response) => response.json())

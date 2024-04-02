@@ -194,7 +194,6 @@ export default {
             this.avatarModal = true;
         },
         getAvatarUrl(avatarId) {
-            console.log(avatarId);
             return `https://api.dicebear.com/7.x/big-smile/svg?seed=${avatarId}&scale=80`;
 
         },

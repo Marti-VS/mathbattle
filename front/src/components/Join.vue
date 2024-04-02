@@ -182,12 +182,12 @@ export default {
         <h1 class="text-5xl font-bold mb-6 text-center">UNEIX-TE</h1>
         <form @submit.prevent>
           <div class="flex my-3">
-            <input type="text" maxlength="1" class="input mr-1" />
-            <input type="text" maxlength="1" class="input mr-1" />
-            <input type="text" maxlength="1" class="input mr-1" />
-            <input type="text" maxlength="1" class="input mr-1" />
-            <input type="text" maxlength="1" class="input mr-1" />
-            <input type="text" maxlength="1" class="input" />
+            <input type="text" maxlength="1" class="input mr-1 font-bold" />
+            <input type="text" maxlength="1" class="input mr-1 font-bold" />
+            <input type="text" maxlength="1" class="input mr-1 font-bold" />
+            <input type="text" maxlength="1" class="input mr-1 font-bold" />
+            <input type="text" maxlength="1" class="input mr-1 font-bold" />
+            <input type="text" maxlength="1" class="input font-bold" />
             <div class="paste-btn-container">
               <button class="paste-btn" @click="() => pasteCode()">
                 <svg fill="black" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
