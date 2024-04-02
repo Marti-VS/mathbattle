@@ -93,7 +93,7 @@ export default {
     createSala(id) {
       socket.emit("createSala", id, getState().usuari.id);
       setState({ usuari: { classe: id } });
-      this.$router.push("/sala");
+      window.location.href = "/lobby";
     },
     async eliminarClasse() {
       const response = await deleteClasse(this.classeEditar);

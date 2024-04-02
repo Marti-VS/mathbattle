@@ -1,0 +1,12 @@
+---
+import Configuration from "../components/Configuration.vue";
+import Information from "../components/Information.vue";
+import MainLayout from "../layouts/MainLayout.astro";
+import WaitingRoom from "../components/WaitingRoom.vue";
+---
+
+<MainLayout>
+  <Information client:visible />
+  <Configuration client:visible />
+  <WaitingRoom client:visible />
+</MainLayout>
