@@ -3,7 +3,7 @@
         <div class="absolute top-0 right-0 mt-8 md:mr-12 mr-3">
             <div>
                 <button v-on:click="() => { dialog = !dialog; editMenu = false }"
-                    class="text-slate-600 hover:text-slate-800 transition-all float-right" variant="text" icon=""
+                    class="text-white hover:text-slate-200 transition-all float-right" variant="text" icon=""
                     size="large">
                     <span class="icon-[material-symbols--settings] size-8"></span>
                 </button>
@@ -282,10 +282,5 @@ export default {
 
 .div-gear {
     position: relative;
-}
-
-. {
-    margin-bottom: -15px;
-    margin-top: -10px;
 }
 </style>
