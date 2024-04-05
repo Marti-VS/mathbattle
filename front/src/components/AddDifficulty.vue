@@ -114,7 +114,7 @@ export default {
   <div class="mx-2 w-full">
     <button
       :class="['block', 'w-full', 'border-2', 'size-24', 'rounded-lg', 'px-4', 'py-2', 'focus:outline-none', 'transition', 'duration-300', getColorClass(jsonDificultat[dificultat].color)]"
-      @click="toggleModal">
+      @click="this.modalDificultat = !this.modalDificultat">
       {{ jsonDificultat[dificultat].text }}
       <p v-if="!jsonDificultat[dificultat].guardat" class="text-sm lowercase">(buit)</p>
     </button>

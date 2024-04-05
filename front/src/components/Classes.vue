@@ -207,7 +207,7 @@ export default {
         @click="$router.push('/join')"
       ></button>
       <button
-        class="mt-4 py-2 rounded-lg bg-white hover:opacity-80 focus:bg-sky-200 text-[#72bae8] font-bold flex justify-start p-4 px-10 transition-all shadow-md shadow-black/20"
+        class="mt-5 py-2 rounded-lg bg-white text-[#72bae8] font-bold flex justify-start px-10 transition-all shadow-md shadow-black/20"
         prepend-icon="mdi-plus"
         @click="mostrarPopUp = !mostrarPopUp"
       >
@@ -263,7 +263,7 @@ export default {
                   </button>
                   <button
                     type="submit"
-                    class="button-pop-up bg-blue-400 hover:opacity-80"
+                    class="button-pop-up bg-blue-400 hover:hover:opacity-80"
                   >
                     ACCEPTAR
                   </button>
@@ -314,7 +314,7 @@ export default {
                   COMENÇA
                 </button>
                 <div class="flex items-center justify-center w-full h-full">
-                  <div class="pt-4">
+                  <div class="p-4">
                     <select
                       v-model="selectedDificultats[classe.idClasse]"
                       class="border border-gray-300 rounded p-3 min-w-36 w-full"
@@ -344,12 +344,18 @@ export default {
     <div v-if="mostrarCrearDificultat">
       <div
         class="fixed inset-0 bg-gray-900 opacity-25 z-10"
-        v-on:click="{mostrarCrearDificultat = !mostrarCrearDificultat; }"
+        v-on:click="
+          {
+            mostrarCrearDificultat = !mostrarCrearDificultat;
+          }
+        "
       ></div>
       <div
         class="absolute w-full h-full flex items-center justify-center top-0"
       >
-        <div class="relative bg-white rounded-xl shadow-xl lg:w-1/3 p-2 md:w-2/4 z-50">
+        <div
+          class="relative bg-white rounded-xl shadow-xl lg:w-1/3 p-2 md:w-2/4 z-50"
+        >
           <div class="bg-white rounded p-4">
             <h2 class="text-center text-3xl font-bold mb-4">
               Crea una nova dificultat
@@ -465,7 +471,6 @@ export default {
 </template>
 
 <style scoped>
-
 .classe {
   display: flex;
   justify-content: space-between;

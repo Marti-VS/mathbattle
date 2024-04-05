@@ -63,7 +63,7 @@ export default {
         state.joinedSala = null;
       } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
         await joinClasse(this.setSala.id_classe, getState().usuari.id);
-        this.$router.push('/sala');
+        window.location.href = '/lobby';
       }
       this.codi = "";
     },
@@ -74,7 +74,7 @@ export default {
     },
   },
   mounted() {
-    getState().usuari.id == null ? this.$router.push("/inici") : null;
+    getState().usuari.id == null ? window.location.href = '/' : null;
     const form = document.querySelector("form");
     const inputs = form.querySelectorAll("input");
     const KEYBOARDS = {
