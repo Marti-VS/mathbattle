@@ -96,11 +96,11 @@ export default {
     getColorClass(color) {
       switch (color) {
         case '#7ed776':
-          return 'border-[#7ed776] hover:border-green-700';
+          return 'border-[#7ed776] hover:border-green-700 hover:shadow-lg hover:bg-[#7ed776] hover:text-white shadow-black';
         case '#768ed7':
-          return 'border-[#768ed7] hover:border-blue-700';
+          return 'border-[#768ed7] hover:border-blue-700 hover:shadow-lg hover:bg-[#768ed7] hover:text-white shadow-black';
         case '#d77676':
-          return 'border-[#d77676] hover:border-red-700';
+          return 'border-[#d77676] hover:border-red-700 hover:shadow-lg hover:bg-[#d77676] hover:text-white shadow-black';
         default:
           return '';
       }
@@ -111,9 +111,9 @@ export default {
 </script>
 
 <template>
-  <div class="mx-2">
+  <div class="mx-2 w-full">
     <button
-      :class="['block', 'border-2', 'size-24', 'rounded-lg', 'px-4', 'py-2', 'focus:outline-none', 'transition', 'duration-300', getColorClass(jsonDificultat[dificultat].color)]"
+      :class="['block', 'w-full', 'border-2', 'size-24', 'rounded-lg', 'px-4', 'py-2', 'focus:outline-none', 'transition', 'duration-300', getColorClass(jsonDificultat[dificultat].color)]"
       @click="toggleModal">
       {{ jsonDificultat[dificultat].text }}
       <p v-if="!jsonDificultat[dificultat].guardat" class="text-sm lowercase">(buit)</p>

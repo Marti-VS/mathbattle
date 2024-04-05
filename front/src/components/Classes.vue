@@ -94,7 +94,7 @@ export default {
       socket.emit("createSala", id, getState().usuari.id);
       let temporal = getState();
       temporal.usuari.classe = id;
-      setState({...getState().usuari, classe: id });
+      setState({ ...getState().usuari, classe: id });
       window.location.href = "/lobby";
     },
     async eliminarClasse() {
@@ -180,11 +180,17 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     getState().usuari.id == null ? (window.location.href = "/") : null;
     this.idProfe = getState().usuari.id;
-    this.getClasses();
-    this.getDificultats();
+    await this.getClasses();
+    await this.getDificultats();
+
+    this.classes.forEach((classe) => {
+      this.selectedDificultats[classe.idClasse] = this.dificultats.find(
+        (dificultat) => dificultat.nomDificultat === "Per defecte"
+      );
+    });
   },
 };
 </script>
@@ -201,7 +207,7 @@ export default {
         @click="$router.push('/join')"
       ></button>
       <button
-        class="mt-4 py-2 rounded-lg bg-white text-[#72bae8] font-bold flex justify-start p-4 px-10 transition-all shadow-md shadow-black/20"
+        class="mt-4 py-2 rounded-lg bg-white hover:opacity-80 focus:bg-sky-200 text-[#72bae8] font-bold flex justify-start p-4 px-10 transition-all shadow-md shadow-black/20"
         prepend-icon="mdi-plus"
         @click="mostrarPopUp = !mostrarPopUp"
       >
@@ -250,14 +256,14 @@ export default {
                 <div class="flex justify-between mt-2">
                   <button
                     type="button"
-                    class="button-pop-up bg-red-400 hover:bg-red-500 mr-3"
+                    class="button-pop-up bg-red-400 hover:opacity-80 mr-3"
                     @click="mostrarPopUp = !mostrarPopUp"
                   >
                     CANCELAR
                   </button>
                   <button
                     type="submit"
-                    class="button-pop-up bg-blue-400 hover:bg-blue-500"
+                    class="button-pop-up bg-blue-400 hover:opacity-80"
                   >
                     ACCEPTAR
                   </button>
@@ -274,7 +280,7 @@ export default {
       <div
         v-for="classe in classes"
         :key="classe.idClasse"
-        class="rounded-lg bg-white shadow-lg overflow-hidden"
+        class="bg-white rounded-lg border-[1px] border-[#d1e8f7)] shadow-lg relative overflow-hidden"
       >
         <div class="relative z-0 px-6 py-4 bg-white">
           <div class="absolute inset-0 w-full object-cover classe h-24 z-0">
@@ -300,18 +306,18 @@ export default {
                   class="icon-[heroicons--users-16-solid] size-4 ml-1"
                 ></span>
               </span>
-              <div class="flex">
+              <div class="flex gap-3">
                 <button
-                  class="button-pop-up bg-[#72bae8] text-white rounded-full p-2 mt-4 h-fit"
+                  class="button-pop-up bg-[#72bae8] focus:bg-[#5a97bd] text-white rounded-full p-2 mt-4 h-fit"
                   @click="createSala(classe.idClasse)"
                 >
                   COMENÇA
                 </button>
-                <div class="flex items-center justify-center">
-                  <div class="p-4">
+                <div class="flex items-center justify-center w-full h-full">
+                  <div class="pt-4">
                     <select
                       v-model="selectedDificultats[classe.idClasse]"
-                      class="border border-gray-300 rounded p-2 w-full"
+                      class="border border-gray-300 rounded p-3 min-w-36 w-full"
                       @change="
                         checkDefaultDifficulty(
                           selectedDificultats[classe.idClasse],
@@ -319,7 +325,6 @@ export default {
                         )
                       "
                     >
-                      <option disabled value="">Seleccione un elemento</option>
                       <option
                         v-for="dificultat in dificultats"
                         :key="dificultat.id"
@@ -339,23 +344,24 @@ export default {
     <div v-if="mostrarCrearDificultat">
       <div
         class="fixed inset-0 bg-gray-900 opacity-25 z-10"
-        v-on:click="dialog = !dialog"
+        v-on:click="{mostrarCrearDificultat = !mostrarCrearDificultat; }"
       ></div>
       <div
         class="absolute w-full h-full flex items-center justify-center top-0"
       >
-        <div class="relative bg-white rounded-xl shadow-xl py-8 px-6 z-50">
+        <div class="relative bg-white rounded-xl shadow-xl lg:w-1/3 p-2 md:w-2/4 z-50">
           <div class="bg-white rounded p-4">
             <h2 class="text-center text-3xl font-bold mb-4">
               Crea una nova dificultat
             </h2>
             <form @submit.prevent="saveDifficulty">
               <div class="mb-4">
-                <label class="block text-lg font-bold mb-2">
+                <label class="pl-1 opacity-80 block">
                   Nom de la nova dificultat
                 </label>
                 <input
                   type="text"
+                  placeholder="La meva dificultat"
                   v-model="nuevaDificultatNombre"
                   class="border border-gray-300 rounded px-4 py-2 w-full"
                   required
@@ -364,7 +370,7 @@ export default {
               <h3 class="text-center text-2xl font-bold mb-4">
                 Afegir dificultats
               </h3>
-              <div class="flex justify-center mb-4">
+              <div class="flex justify-center mb-6">
                 <AddDifficulty
                   v-for="index in 3"
                   :key="index"
@@ -375,16 +381,16 @@ export default {
               <div class="flex justify-between">
                 <button
                   type="submit"
-                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
+                  class="bg-[#72bae8] transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded mr-4"
                 >
-                  Desa
+                  DESA
                 </button>
                 <button
                   type="button"
                   @click="cancelarCrearDificultat"
-                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  class="bg-red-500 transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
                 >
-                  Cancela
+                  CANCELA
                 </button>
               </div>
             </form>
@@ -446,7 +452,7 @@ export default {
               </button>
               <button
                 type="submit"
-                class="button-pop-up bg-blue-400 hover:bg-blue-500"
+                class="button-pop-up bg-[#72bae8] hover:bg-blue-500"
               >
                 ACCEPTAR
               </button>
@@ -459,15 +465,6 @@ export default {
 </template>
 
 <style scoped>
-.full-container {
-  min-height: 100vh;
-  margin: 0;
-  background-color: lightblue;
-}
-
-.div {
-  overflow-y: hidden !important;
-}
 
 .classe {
   display: flex;
@@ -489,6 +486,6 @@ export default {
 }
 
 .button-pop-up {
-  @apply text-white rounded-md py-3 px-6 w-full transition-all font-bold shadow-md shadow-black/30;
+  @apply text-white rounded-md py-3 px-6 w-full transition-all font-bold shadow-sm shadow-black/30 hover:opacity-90;
 }
 </style>
