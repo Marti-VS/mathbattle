@@ -215,7 +215,7 @@ export default {
             console.log("Dentro")
             setState({ usuari: { email: this.email } });
 
-            let response = await fetch(import.meta.env.VITE_NODE_ROUTE + "/changePassword", {
+            let response = await fetch(import.meta.env.PUBLIC_NODE + "/changePassword", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
