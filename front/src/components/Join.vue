@@ -1,13 +1,15 @@
 <script setup>
-import { getState } from "../store/store.js";
+import { getState, setState } from "../store/store.js";
+import useSocketStore from "../store/socketStore.js";
 </script>
 <script>
 import { joinClasse } from "../services/communicationManager";
-import { socket, state } from "../services/socket";
+// import { socket, state } from "../services/socket";
 
 export default {
   data() {
     return {
+      socket: useSocketStore.getState().socket,
       errorCode: false,
       errorText: "",
       proveSala: false,
@@ -22,8 +24,8 @@ export default {
       for (let i = 0; i < inputs.length; i++) {
         this.codi += inputs[i].value.toString();
       }
-      getState().usuari.classe = "";
-      socket.emit("joinSala", {
+      setState({ ...getState().usuari, classe: "" });
+      this.socket.emit("joinSala", {
         codi: this.codi,
         username: getState().usuari.nom,
         idAvatar: getState().usuari.avatar,
@@ -60,7 +62,7 @@ export default {
         this.errorCode = true;
         this.errorText = "El codi de la sala no existeix";
         this.proveSala = false;
-        state.joinedSala = null;
+        useSocketStore.getState().joinedSala = null;
       } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
         await joinClasse(this.setSala.id_classe, getState().usuari.id);
         window.location.href = '/lobby';
@@ -70,7 +72,7 @@ export default {
   },
   computed: {
     setSala() {
-      return state.joinedSala;
+      return useSocketStore.getState().joinedSala;
     },
   },
   mounted() {
@@ -171,7 +173,7 @@ export default {
         }
       });
     });
-  },
+  }
 };
 </script>
 

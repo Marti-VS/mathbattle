@@ -1,6 +1,7 @@
 import io from "socket.io-client";
 import { reactive } from "vue";
 import _ from 'lodash';
+import useSocketStore from "../store/store.js";
 
 export const socket = io(import.meta.env.PUBLIC_NODE);
 let num = 0;
@@ -42,6 +43,8 @@ socket.on("actualizarOperacion", (data) => {
 });
 
 socket.on("join", (data) => {
+  useSocketStore.setState({ ...useSocketStore.getState(), joinedSala: data });
+  useSocketStore.setState({ ...useSocketStore.getState(), play: false });
   state.joinedSala = data;
   state.play = false;
 });

@@ -1,5 +1,6 @@
 <script>
-import { socket, state } from "../services/socket";
+// import { socket, state } from "../services/socket";
+import useSocketStore from "../store/socketStore.js";
 import { getState } from "../store/store.js";
 import PlayersVS from "../components/PlayersVS.vue";
 import Jugador from "../components/Jugador.vue";
@@ -7,10 +8,10 @@ import Jugador from "../components/Jugador.vue";
 export default {
   data() {
     return {
+      socket: useSocketStore.getState().socket,
       myId: null,
       owner: false,
       kick: false,
-      store: getState(),
       playing: false,
       partidasFiltradas: [],
       playProf: false,
@@ -26,17 +27,17 @@ export default {
         this.canPlayModal = true;
         return;
       }
-      socket.emit("startGame", {
-        idClasse: this.store.usuari.classe,
+      this.socket.emit("startGame", {
+        idClasse: getState().usuari.classe,
         playProf: this.playProf,
       });
     },
     leaveSala() {
       if (this.myId == this.sala.owner) {
-        socket.emit("leaveAllSala", {});
+        this.socket.emit("leaveAllSala", {});
         window.location.href = "/class"
       } else {
-        socket.emit("leaveSala", {});
+        this.socket.emit("leaveSala", {});
         window.location.href = "/join"
       }
     },
@@ -79,9 +80,11 @@ export default {
         }, 3000);
       } else {
         if (nuevoValor.owner == this.myId) {
+          console.log(nuevoValor);
+          console.log(this.myId);
           this.owner = true;
         } else {
-          if (nuevoValor.owner_id == this.store.usuari.id) {
+          if (nuevoValor.owner_id == getState().usuari.id) {
             this.owner = false;
             this.kick = true;
             setTimeout(() => {
@@ -101,23 +104,22 @@ export default {
     },
     partidas: function (nuevoValor, antiguoValor) { },
     "store.usuari.avatar": function () {
-      socket.emit("changeAvatar", this.sala.id_sala, this.store.usuari.avatar);
+      this.socket.emit("changeAvatar", this.sala.id_sala, getState().usuari.avatar);
     },
   },
   computed: {
     sala() {
-      this.myId = socket.id;
-      console.log(state.joinedSala);
-      return state.joinedSala;
+      this.myId = this.socket.id;
+      return useSocketStore.getState().joinedSala;
     },
     play() {
-      return state.play;
+      return useSocketStore.getState().play;
     },
     partidas() {
-      let partidasFiltro = state.partidas;
+      let partidasFiltro = useSocketStore.getState().partidas;
 
-      if (state.partidas) {
-        if (state.partidas.every((partida) => partida.status == "finish")) {
+      if (useSocketStore.getState().partidas) {
+        if (useSocketStore.getState().partidas.every((partida) => partida.status == "finish")) {
           this.playing = false;
         } else {
           this.playing = true;
@@ -125,7 +127,7 @@ export default {
         partidasFiltro = partidasFiltro.filter(
           (partida) => partida.status != "finish"
         );
-        this.filterWins(state.partidas);
+        this.filterWins(useSocketStore.getState().partidas);
       } else {
         this.playing = false;
       }
@@ -136,21 +138,28 @@ export default {
 
       this.partidasFiltradas = partidasFiltro;
 
-      return state.partidas;
+      return useSocketStore.getState().partidas;
     },
   },
   mounted() {
-    this.myId = socket.id;
+    this.myId = this.socket.id;
+    console.log(this.socket.id)
     if (this.sala == null || this.sala == false) {
-      socket.emit("getSala", this.store.usuari.id, this.store.usuari.classe);
+      this.socket.emit("getSala", getState().usuari.id, getState().usuari.classe);
     } else {
-      if (this.store.usuari.classe != "") {
-        if (this.sala.id_classe != this.store.usuari.classe) {
-          socket.emit(
+      console.log(this.sala.owner)
+      console.log(this.myId);
+      if (getState().usuari.classe != "") {
+        if (this.sala.id_classe != getState().usuari.classe) {
+          this.socket.emit(
             "getSala",
-            this.store.usuari.id,
-            this.store.usuari.classe
+            getState().usuari.id,
+            getState().usuari.classe
           );
+        } else {
+          if (this.sala.owner == this.myId) {
+            this.owner = true;
+          }
         }
       }
     }

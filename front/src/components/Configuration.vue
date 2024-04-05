@@ -5,7 +5,8 @@
                 <button v-on:click="() => { dialog = !dialog; editMenu = false }"
                     class="text-white hover:text-slate-200 transition-all float-right" variant="text" icon=""
                     size="large">
-                    <span class="icon-[tdesign--user] size-8"></span>
+                    <!-- <span class="icon-[tdesign--user] size-8"></span> -->
+                    <span class="icon-[line-md--account] size-8"></span>
                 </button>
                 <div v-if="dialog" key="1" activator="top-right-svg">
                     <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
