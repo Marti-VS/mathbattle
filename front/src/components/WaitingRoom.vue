@@ -120,17 +120,18 @@ export default {
         }
       }
     }
-    subSocket((nuevoValor, antiguoValor) => {
-      console.log(nuevoValor.sala);
-      if (nuevoValor.sala == false || nuevoValor == null) {
+
+    subSocket((state) => {
+      console.log(state.sala);
+      if (state.sala == false || state.sala == null) {
         setTimeout(() => {
           window.location.href = "/join";
         }, 3000);
       } else {
-        if (nuevoValor.owner == this.myId) {
+        if (state.owner == this.myId) {
           this.owner = true;
         } else {
-          if (nuevoValor.owner_id == getState().usuari.id) {
+          if (state.owner_id == getState().usuari.id) {
             this.owner = false;
             this.kick = true;
             setTimeout(() => {
@@ -140,8 +141,8 @@ export default {
         }
       }
       if (
-        (nuevoValor.play == true && this.owner == false) ||
-        (nuevoValor.play == true && this.playProf == true)
+        (state.play == true && this.owner == false) ||
+        (state.play == true && this.playProf == true)
       ) {
         window.location.href = "/game";
       }
@@ -161,19 +162,9 @@ export default {
     <div class="full-container" v-if="sala && kick == false">
       <div class="button_leave">
         <button @click="leaveSala()">
-          <svg
-            class="h-6 w-6"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            ></path>
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+            </path>
           </svg>
         </button>
       </div>
@@ -186,42 +177,23 @@ export default {
       </h2>
       <button
         class="my-4 py-2 rounded-lg bg-white text-[#72bae8] font-bold flex justify-start px-10 transition-all shadow-md shadow-black/20"
-        @click="startGame()"
-        v-if="myId == sala.owner && playing == false"
-      >
+        @click="startGame()" v-if="myId == sala.owner && playing == false">
         COMENÇA
       </button>
       <h2 v-else-if="myId == sala.owner && playing == true">
         S'estan jugant les partides
       </h2>
-      <label
-        v-if="myId == sala.owner && playing == false"
-        class="inline-flex items-center mb-5 cursor-pointer"
-      >
-        <input
-          type="checkbox"
-          id="joinGame"
-          @click="changePlayProf"
-          value=""
-          class="sr-only peer"
-        />
+      <label v-if="myId == sala.owner && playing == false" class="inline-flex items-center mb-5 cursor-pointer">
+        <input type="checkbox" id="joinGame" @click="changePlayProf" value="" class="sr-only peer" />
         <div
-          class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-        ></div>
-        <label
-          for="joinGame"
-          class="rounded pr-2 text-slate-500 font-semibold ml-4"
-          >Vols unir-te a la partida?</label
-        >
+          class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+        </div>
+        <label for="joinGame" class="rounded pr-2 text-slate-500 font-semibold ml-4">Vols unir-te a la partida?</label>
       </label>
       <div class="user-row" v-if="partidasFiltradas.length != 0">
         <div>
           <div class="playing-container">
-            <div
-              class="partida-container"
-              v-for="(partida, index) in partidasFiltradas"
-              :key="index"
-            >
+            <div class="partida-container" v-for="(partida, index) in partidasFiltradas" :key="index">
               <PlayersVS :partida="partida" />
             </div>
           </div>
@@ -232,50 +204,27 @@ export default {
         <div class="jugadors-container">
           <h1 class="text-h2 font-black">Jugadors esperant</h1>
           <div class="jugadors-list">
-            <div
-              class="user-item"
-              v-for="(jugador, index) in sala.jugadores"
-              :key="index"
-            >
+            <div class="user-item" v-for="(jugador, index) in sala.jugadores" :key="index">
               <Jugador :jugador="jugador" />
             </div>
           </div>
         </div>
         <div v-if="canPlayModal">
           <div class="fixed z-10 inset-0 overflow-y-auto">
-            <div
-              class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
-            >
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div class="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
               </div>
-              <span
-                class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                aria-hidden="true"
-                >&#8203;</span
-              >
+              <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
               <div
-                class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-              >
+                class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                 <div>
-                  <div
-                    class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100"
-                  >
+                  <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
                     <!-- Heroicon name: exclamation -->
-                    <svg
-                      class="h-6 w-6 text-red-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 9v2m0 4h.01m-6.938 3h13.856a2 2 0 002-2V10a2 2 0 00-2-2H5.063a2 2 0 00-2 2v7a2 2 0 002 2z"
-                      />
+                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 3h13.856a2 2 0 002-2V10a2 2 0 00-2-2H5.063a2 2 0 00-2 2v7a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div class="mt-3 text-center sm:mt-5">
@@ -287,11 +236,9 @@ export default {
                     </div>
                   </div>
                   <div class="mt-5 sm:mt-6">
-                    <button
-                      type="button"
+                    <button type="button"
                       class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-base font-medium text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
-                      @click="canPlayModal = false"
-                    >
+                      @click="canPlayModal = false">
                       Tancar
                     </button>
                   </div>
@@ -305,19 +252,9 @@ export default {
     <div class="w-full flex flex-col items-center" v-else ref="elseBlock">
       <div class="button_leave">
         <button @click="leaveSala()">
-          <svg
-            class="h-6 w-6"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            ></path>
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+            </path>
           </svg>
         </button>
       </div>
