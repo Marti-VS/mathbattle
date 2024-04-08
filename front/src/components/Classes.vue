@@ -1,5 +1,6 @@
 <script setup>
 import { getState, setState } from "../store/store.js";
+import { getState as getSocket } from "../store/socketStore.js";
 </script>
 <script>
 import {
@@ -11,7 +12,6 @@ import {
   addOperation,
   getDificultatsFetch,
 } from "../services/communicationManager";
-import { socket } from "../services/socket";
 import AddDifficulty from "../components/AddDifficulty.vue";
 
 export default {
@@ -91,7 +91,7 @@ export default {
       this.mostrarPopUpEditar = true;
     },
     createSala(id) {
-      socket.emit("createSala", id, getState().usuari.id);
+      getSocket().createSala(id, getState().usuari.id);
       let temporal = getState();
       temporal.usuari.classe = id;
       setState({ ...getState().usuari, classe: id });
@@ -384,19 +384,19 @@ export default {
                   @afegirDificultat="afegirDificultats[index - 1] = $event"
                 />
               </div>
-              <div class="flex justify-between">
-                <button
-                  type="submit"
-                  class="bg-[#72bae8] transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded mr-4"
-                >
-                  DESA
-                </button>
+              <div class="flex justify-between gap-3">
                 <button
                   type="button"
                   @click="cancelarCrearDificultat"
-                  class="bg-red-500 transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
+                  class="bg-red-400 transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
                 >
                   CANCELA
+                </button>
+                <button
+                  type="submit"
+                  class="bg-[#72bae8] transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
+                >
+                  DESA
                 </button>
               </div>
             </form>

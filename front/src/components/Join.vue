@@ -1,6 +1,6 @@
 <script setup>
 import { getState, setState } from "../store/store.js";
-import useSocketStore from "../store/socketStore.js";
+import {getState as getSocket} from "../store/socketStore.js";
 </script>
 <script>
 import { joinClasse } from "../services/communicationManager";
@@ -9,7 +9,7 @@ import { joinClasse } from "../services/communicationManager";
 export default {
   data() {
     return {
-      socket: useSocketStore.getState().socket,
+      socket: getSocket().socket,
       errorCode: false,
       errorText: "",
       proveSala: false,
@@ -62,7 +62,7 @@ export default {
         this.errorCode = true;
         this.errorText = "El codi de la sala no existeix";
         this.proveSala = false;
-        useSocketStore.getState().joinedSala = null;
+        getSocket().joinedSala = null;
       } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
         await joinClasse(this.setSala.id_classe, getState().usuari.id);
         window.location.href = '/lobby';
@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     setSala() {
-      return useSocketStore.getState().joinedSala;
+      return getSocket().joinedSala;
     },
   },
   mounted() {

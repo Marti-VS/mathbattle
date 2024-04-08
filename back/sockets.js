@@ -45,6 +45,8 @@ function crearPartida(user, jugador) {
 
 function sockets(io) {
   io.on("connection", (socket) => {
+    socket.id = "mi pollita";
+
     socket.on("conectarUsuario", (user) => {
       gestionarPartida(socket, user, io);
     });
@@ -57,12 +59,12 @@ function sockets(io) {
       solveOperation(idPartida, idJugador, idUsuari, idClasse, result, socket.id);
     });
 
-    socket.on("createSala", (idClasse, idUser) => {
-      crearSala(idClasse, socket.id, idUser);
+    socket.on("createSala", (idClasse, socketId, idUser) => {
+      crearSala(idClasse, socketId, idUser);
     });
 
-    socket.on("getSala", (idUser, idClasse) => {
-      getSala(socket.id, idUser, idClasse);
+    socket.on("getSala", (socketId, idUser, idClasse) => {
+      getSala(socketId, idUser, idClasse);
     });
 
     socket.on("changeAvatar", (idSocket, avatar) => {
@@ -84,13 +86,13 @@ function sockets(io) {
       }
 
       for (let i = 0; i < totalPlayers; i++) {
-        io.to(sala.jugadores[i].id_jugador).emit("startGame", { idSala: sala.id_sala, play: true });
+        io.to(sala.jugadores[i].id_jugador).emit("getGame", { idSala: sala.id_sala, play: true });
       }
 
       if (sala.jugadores.length % 2 != 0 && startGameInfo.playProf == true) {
-        io.to(sala.owner).emit("startGame", { idSala: sala.id_sala, play: true });
+        io.to(sala.owner).emit("getGame", { idSala: sala.id_sala, play: true });
       } else {
-        io.to(sala.owner).emit("startGame", { idSala: sala.id_sala, play: false });
+        io.to(sala.owner).emit("getGame", { idSala: sala.id_sala, play: false });
       }
     });
 
@@ -239,6 +241,7 @@ function sockets(io) {
 
       countSala++;
       salas.push(sala);
+      console.log(salas);
       io.to(socketId).emit("join", sala);
     }
   }
@@ -254,8 +257,11 @@ function sockets(io) {
     if (sala) {
       let previusOwner = sala.owner;
       sala.owner = idSocket;
-      io.to(sala.owner).emit("join", sala);
-      io.to(previusOwner).emit("join", sala);
+      setTimeout(() =>{
+        console.log(sala.owner);
+        io.to(sala.owner).emit("join", sala);
+        io.to(previusOwner).emit("join", sala);
+      },3000);
 
       sendPartidas(sala.owner, sala.id_sala, io);
     } else {
