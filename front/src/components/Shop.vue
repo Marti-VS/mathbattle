@@ -39,6 +39,9 @@
 </template>
 
 <script>
+import Calculin from '../assets/pink.png'
+import Fraccionado from '../assets/blue.png'
+import Geometrado from '../assets/white.png'
 
 export default {
     data() {
@@ -47,29 +50,22 @@ export default {
             avatars: [
                 {
                     title: 'Calculín',
-                    alt: 'Space Explorer',
-                    image: '/placeholder.svg',
+                    alt: 'Calculín Avatar',
+                    image: Calculin.src,
                     size: 150,
                     aspectRatio: '150/150'
                 },
                 {
-                    title: 'Pixel Picasso',
-                    alt: 'Pixel Picasso',
-                    image: '/placeholder.svg',
+                    title: 'Geometrado',
+                    alt: 'Geometrado Avatar',
+                    image: Geometrado.src,
                     size: 150,
                     aspectRatio: '150/150'
                 },
                 {
-                    title: 'Crypto Crusader',
-                    alt: 'Crypto Crusader',
-                    image: '/placeholder.svg',
-                    size: 150,
-                    aspectRatio: '150/150'
-                },
-                {
-                    title: 'Digital Diva',
-                    alt: 'Digital Diva',
-                    image: '/placeholder.svg',
+                    title: 'Fraccionado',
+                    alt: 'Fraccionado Avatar',
+                    image: Fraccionado.src,
                     size: 150,
                     aspectRatio: '150/150'
                 }
