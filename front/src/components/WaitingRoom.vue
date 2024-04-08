@@ -1,5 +1,5 @@
 <script>
-import { getState as getSocket } from "../store/socketStore.js";
+import { getState as getSocket, subscribe as subSocket } from "../store/socketStore.js";
 import { getState } from "../store/store.js";
 import PlayersVS from "../components/PlayersVS.vue";
 import Jugador from "../components/Jugador.vue";
@@ -67,44 +67,6 @@ export default {
     PlayersVS,
     Jugador,
   },
-  watch: {
-    sala: function (nuevoValor, antiguoValor) {
-      if (nuevoValor == false || nuevoValor == null) {
-        setTimeout(() => {
-          window.location.href = "/join";
-        }, 3000);
-      } else {
-        if (nuevoValor.owner == this.myId) {
-          console.log(nuevoValor);
-          this.owner = true;
-        } else {
-          if (nuevoValor.owner_id == getState().usuari.id) {
-            this.owner = false;
-            this.kick = true;
-            setTimeout(() => {
-              window.location.href = "/join";
-            }, 3000);
-          }
-        }
-      }
-    },
-    play: function (nuevoValor, antiguoValor) {
-      if (
-        (nuevoValor == true && this.owner == false) ||
-        (nuevoValor == true && this.playProf == true)
-      ) {
-        window.location.href = "/game";
-      }
-    },
-    partidas: function (nuevoValor, antiguoValor) {},
-    "store.usuari.avatar": function () {
-      this.socket.emit(
-        "changeAvatar",
-        this.sala.id_sala,
-        getState().usuari.avatar
-      );
-    },
-  },
   computed: {
     sala() {
       this.myId = localStorage.getItem("socketId");
@@ -158,6 +120,38 @@ export default {
         }
       }
     }
+    subSocket((nuevoValor, antiguoValor) => {
+      console.log(nuevoValor.sala);
+      if (nuevoValor.sala == false || nuevoValor == null) {
+        setTimeout(() => {
+          window.location.href = "/join";
+        }, 3000);
+      } else {
+        if (nuevoValor.owner == this.myId) {
+          this.owner = true;
+        } else {
+          if (nuevoValor.owner_id == getState().usuari.id) {
+            this.owner = false;
+            this.kick = true;
+            setTimeout(() => {
+              window.location.href = "/join";
+            }, 3000);
+          }
+        }
+      }
+      if (
+        (nuevoValor.play == true && this.owner == false) ||
+        (nuevoValor.play == true && this.playProf == true)
+      ) {
+        window.location.href = "/game";
+      }
+
+      // this.socket.emit(
+      //   "changeAvatar",
+      //   this.sala.id_sala,
+      //   getState().usuari.avatar
+      // );
+    })
   },
 };
 </script>

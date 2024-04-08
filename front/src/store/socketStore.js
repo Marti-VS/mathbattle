@@ -50,7 +50,14 @@ export const useSocketStore = createStore(
       },
       createSala: (classeId, userId) => {
         socket.emit("createSala", classeId, localStorage.getItem('socketId'), userId);
-      }
+      },
+      joinSala: (codi, username, idAvatar) => {
+        socket.emit("joinSala", {
+            codi: codi,
+            username: username,
+            idAvatar: idAvatar,
+          });
+      },
     }),
     {
       name: "socketStore",

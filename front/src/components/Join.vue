@@ -1,15 +1,13 @@
 <script setup>
-import { getState, setState } from "../store/store.js";
-import {getState as getSocket} from "../store/socketStore.js";
+import { getState, setState, subscribe } from "../store/store.js";
+import {getState as getSocket, subscribe as subSocket} from "../store/socketStore.js";
 </script>
 <script>
 import { joinClasse } from "../services/communicationManager";
-// import { socket, state } from "../services/socket";
 
 export default {
   data() {
     return {
-      socket: getSocket().socket,
       errorCode: false,
       errorText: "",
       proveSala: false,
@@ -25,11 +23,7 @@ export default {
         this.codi += inputs[i].value.toString();
       }
       setState({ ...getState().usuari, classe: "" });
-      this.socket.emit("joinSala", {
-        codi: this.codi,
-        username: getState().usuari.nom,
-        idAvatar: getState().usuari.avatar,
-      });
+      getSocket().joinSala(this.codi, getState().usuari.nom, getState().usuari.avatar);
     },
     async pasteCode() {
       try {
@@ -56,20 +50,6 @@ export default {
       }
     },
   },
-  watch: {
-    setSala: async function (nuevoValor) {
-      if (nuevoValor == false) {
-        this.errorCode = true;
-        this.errorText = "El codi de la sala no existeix";
-        this.proveSala = false;
-        getSocket().joinedSala = null;
-      } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
-        await joinClasse(this.setSala.id_classe, getState().usuari.id);
-        window.location.href = '/lobby';
-      }
-      this.codi = "";
-    },
-  },
   computed: {
     setSala() {
       return getSocket().joinedSala;
@@ -85,6 +65,19 @@ export default {
       arrowRight: 39,
       enter: 13,
     };
+
+    subSocket(async (nuevoValor) => {
+      if (nuevoValor == false) {
+        this.errorCode = true;
+        this.errorText = "El codi de la sala no existeix";
+        this.proveSala = false;
+        getSocket().joinedSala = null;
+      } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
+        await joinClasse(this.setSala.id_classe, getState().usuari.id);
+        window.location.href = '/lobby';
+      }
+      this.codi = "";
+    });
 
     function handleInput(e) {
       const input = e.target;
