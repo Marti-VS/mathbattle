@@ -45,7 +45,9 @@ function crearPartida(user, jugador) {
 
 function sockets(io) {
   io.on("connection", (socket) => {
-    socket.id = "mi pollita";
+    socket.on('socketId', (id) => {
+      socket.join(id);
+    });
 
     socket.on("conectarUsuario", (user) => {
       gestionarPartida(socket, user, io);

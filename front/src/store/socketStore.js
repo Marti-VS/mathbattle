@@ -6,11 +6,14 @@ import io from "socket.io-client";
 const socket = io(import.meta.env.PUBLIC_NODE);
 
 socket.on("connect", () => {
-    if (!localStorage.getItem("socketId")) {
-        localStorage.setItem("socketId", socket.id);
-      } else {
-        socket.id = localStorage.getItem("socketId");
-      }
+    if (typeof window !== "undefined") {
+        if (!localStorage.getItem('socketId')) {
+            localStorage.setItem('socketId', socket.id);
+        } else {
+            socket.id = localStorage.getItem('socketId');
+        }
+    }
+    socket.emit("socketId", socket.id);
 });
 
 export const useSocketStore = createStore(
@@ -43,16 +46,11 @@ export const useSocketStore = createStore(
         });
       },
       getSala: (id, classe) => {
-        socket.emit("getSala", localStorage.getItem("socketId"), id, classe);
+        socket.emit("getSala", localStorage.getItem('socketId'), id, classe);
       },
       createSala: (classeId, userId) => {
-        socket.emit(
-          "createSala",
-          classeId,
-          localStorage.getItem("socketId"),
-          userId
-        );
-      },
+        socket.emit("createSala", classeId, localStorage.getItem('socketId'), userId);
+      }
     }),
     {
       name: "socketStore",
@@ -95,7 +93,7 @@ socket.on("actualizarOperacion", (data) => {
 });
 
 socket.on("join", (data) => {
-  console.log(data);
+    console.log(data);
   useSocketStore.setState((state) => ({
     ...state,
     joinedSala: data,
