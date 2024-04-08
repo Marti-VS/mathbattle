@@ -6,7 +6,11 @@ import io from "socket.io-client";
 const socket = io(import.meta.env.PUBLIC_NODE);
 
 socket.on("connect", () => {
-    console.log(socket.id);
+    if (!localStorage.getItem("socketId")) {
+        localStorage.setItem("socketId", socket.id);
+      } else {
+        socket.id = localStorage.getItem("socketId");
+      }
 });
 
 export const useSocketStore = createStore(
