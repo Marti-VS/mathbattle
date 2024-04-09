@@ -10,5 +10,5 @@ import MainLayout from "../layouts/MainLayout.astro";
   <Information client:visible />
   <Configuration client:visible />
   <JoinComponent client:visible />
-  <Shop client:visible />
+  <Shop client:only="vue" />
 </MainLayout>

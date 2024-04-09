@@ -172,3 +172,51 @@ export function getDificultatsFetch(idProfe) {
     }).then((response) => resolve(response));
   });
 }
+
+export function setAvatar(idAvatar, idUsu) {
+  return new Promise((resolve, reject) => {
+    fetch(NODE + `/equiparAvatar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: idAvatar,
+        idUsu: idUsu,
+      }),
+    }).then((response) => response.json())
+      .then((data) => { resolve(data) });
+  });
+}
+
+export function buyedAvatars(idUsu) {
+  return new Promise((resolve, reject) => {
+    fetch(NODE + `/verAvatares`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idUsu: idUsu,
+      }),
+    }).then((response) => response.json())
+      .then((data) => { resolve(data) });
+  });
+}
+
+export function buyAvatar(idAvatar, idUsu) {
+  return new Promise((resolve, reject) => {
+    fetch(NODE + `/comprarAvatar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: idAvatar,
+        idUsu: idUsu,
+      }),
+    }).then((response) => response.json())
+      .then((data) => { resolve(data) });
+  });
+}
+

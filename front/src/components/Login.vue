@@ -1,25 +1,18 @@
 <template>
   <div class="h-screen flex flex-col gap-3 items-center justify-center">
     <div class="flex justify-center bg-white rounded-2xl shadow-lg h-96">
-      <div
-        :class="
-          (!registred
-            ? 'rounded-l-2xl w-[20vw] flex items-center justify-center px-16 bg-[url(/src/assets/Background.png)] '
-            : '') +
-          'rounded-l-2xl w-[20vw] flex items-center justify-center px-16'
-        "
-      >
+      <div :class="(!registred
+        ? 'rounded-l-2xl w-[20vw] flex items-center justify-center px-16 bg-[url(/src/assets/Background.png)] '
+        : '') +
+        'rounded-l-2xl w-[20vw] flex items-center justify-center px-16'
+        ">
         <div :class="registred ? 'hidden duration-700 ease-in-out' : ''">
           <h1 class="font-bold text-4xl mb-5 text-center">Ja tens compte?</h1>
-          <button
-            :onclick="
-              () => {
-                registred = !registred;
-                formErrors = '';
-              }
-            "
-            class="p-2 bg-blue-600 rounded font-bold w-full text-white"
-          >
+          <button :onclick="() => {
+        registred = !registred;
+        formErrors = '';
+      }
+        " class="p-2 bg-blue-600 rounded font-bold w-full text-white">
             Inicia sessió
           </button>
         </div>
@@ -31,53 +24,35 @@
             <label>
               <p class="pl-2 opacity-80">Email</p>
 
-              <input
-                v-model="loginData.email"
-                placeholder="Email"
-                type="email"
-                autocomplete="username"
-                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
+              <input v-model="loginData.email" placeholder="Email" type="email" autocomplete="username"
+                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
             </label>
             <label>
               <p class="pl-2 opacity-80">Contrasenya</p>
-              <input
-                v-model="loginData.password"
-                type="password"
-                autocomplete="current-password"
+              <input v-model="loginData.password" type="password" autocomplete="current-password"
                 placeholder="Contrassenya"
-                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
+                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
             </label>
 
-            <button
-              type="submit"
-              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors"
-            >
+            <button type="submit"
+              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors">
               Inicia sessió
             </button>
           </form>
         </div>
       </div>
-      <div
-        :class="
-          (registred ? 'bg-[url(/src/assets/Background.png)]' : '') +
-          ' rounded-r-2xl w-[20vw] flex items-center justify-center px-16'
-        "
-      >
+      <div :class="(registred ? 'bg-[url(/src/assets/Background.png)]' : '') +
+        ' rounded-r-2xl w-[20vw] flex items-center justify-center px-16'
+        ">
         <div :class="!registred ? 'hidden duration-700 ease-in-out' : ''">
           <h1 class="text-center text-4xl font-bold mb-7">
             Encara no tens compte?
           </h1>
-          <button
-            :onclick="
-              () => {
-                registred = !registred;
-                formErrors = '';
-              }
-            "
-            class="p-2 bg-blue-600 rounded font-bold w-full text-white"
-          >
+          <button :onclick="() => {
+        registred = !registred;
+        formErrors = '';
+      }
+        " class="p-2 bg-blue-600 rounded font-bold w-full text-white">
             Crea't un!
           </button>
         </div>
@@ -87,40 +62,24 @@
             <div class="grid grid-cols-2 gap-2">
               <label>
                 <p class="pl-2 opacity-80">Nom d'usuari</p>
-                <input
-                  v-model="registerData.name"
-                  placeholder="Nom d'usuari"
-                  type="name"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
+                <input v-model="registerData.name" placeholder="Nom d'usuari" type="name"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
               </label>
               <label>
                 <p class="pl-2 opacity-80">Email</p>
-                <input
-                  v-model="registerData.email"
-                  placeholder="Email"
-                  type="email"
-                  autocomplete="username"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
+                <input v-model="registerData.email" placeholder="Email" type="email" autocomplete="username"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
               </label>
             </div>
 
             <label>
               <p class="pl-2 opacity-80">Contrasenya</p>
-              <input
-                v-model="registerData.password"
-                placeholder="Contrassenya"
-                type="password"
+              <input v-model="registerData.password" placeholder="Contrassenya" type="password"
                 autocomplete="current-password"
-                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
+                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
             </label>
-            <button
-              id="btnSubmit"
-              type="submit"
-              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors"
-            >
+            <button id="btnSubmit" type="submit"
+              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors">
               Registra't
             </button>
           </form>
@@ -129,9 +88,7 @@
     </div>
     <div
       class="flex items-center p-4 max-w-[40vw] text-pretty mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-100"
-      role="alert"
-      :class="formErrors != '' ? 'visible' : 'invisible'"
-    >
+      role="alert" :class="formErrors != '' ? 'visible' : 'invisible'">
       <span class="icon-[material-symbols--info] size-8 mr-3"></span>
       <div><span class="font-medium">Error!</span> {{ formErrors }}</div>
     </div>
@@ -199,6 +156,7 @@ export default {
             nom: this.registerData.name,
             email: this.registerData.email,
             id: data.userData.insertId,
+            avatar: 1
           },
         });
         window.location.href = "/join";
@@ -216,6 +174,7 @@ export default {
             cognom: data.userData.cognom,
             email: data.userData.correu,
             id: data.userData.idUsu,
+            avatar: data.userData.avatar
           },
         });
         console.log(getState());
