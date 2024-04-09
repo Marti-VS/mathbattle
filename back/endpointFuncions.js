@@ -253,6 +253,56 @@ function getDificultats(idProfe) {
   });
 }
 
+function setAvatar(id, idUsu) {
+  return new Promise((resolve, reject) => {
+    const sql = "UPDATE USUARIS SET avatar = ? WHERE idUsu = ?";
+    const values = [id, idUsu, idUsu];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        if (result.affectedRows > 0) {
+          resolve({ message: "Avatar updated successfully", rows: result.affectedRows });
+        } else {
+          resolve({ message: "No avatar updated for the given conditions", rows: result.affectedRows });
+        }
+      }
+    });
+  });
+}
+
+function buyedAvatars(idUsu) {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT avatar_number FROM COMPRASAVATARES WHERE user_id = ?; ";
+    const values = [idUsu];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+function insertCompraAvatar(avatarNumber, idUsu) {
+  return new Promise((resolve, reject) => {
+    const sql = "INSERT INTO COMPRASAVATARES (user_id, avatar_number) VALUES (?, ?)";
+    const values = [idUsu, avatarNumber];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+
 module.exports = {
   createClass,
   addDifficulty,
@@ -267,5 +317,8 @@ module.exports = {
   login,
   register,
   changePassword,
-  getDificultats
+  getDificultats,
+  setAvatar,
+  buyedAvatars,
+  insertCompraAvatar
 };

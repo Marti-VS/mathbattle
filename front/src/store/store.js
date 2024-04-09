@@ -11,6 +11,7 @@ const useUserStore = createStore(
         id: null,
         avatar: 0,
         classe: '',
+        buyedAvatars: [],
       },
     }),
     {

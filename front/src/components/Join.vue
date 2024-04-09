@@ -1,6 +1,6 @@
 <script setup>
 import { getState, setState, subscribe } from "../store/store.js";
-import {getState as getSocket, subscribe as subSocket} from "../store/socketStore.js";
+import { getState as getSocket, subscribe as subSocket } from "../store/socketStore.js";
 </script>
 <script>
 import { joinClasse } from "../services/communicationManager";
@@ -22,7 +22,7 @@ export default {
       for (let i = 0; i < inputs.length; i++) {
         this.codi += inputs[i].value.toString();
       }
-      setState({ ...getState().usuari, classe: "" });
+      setState({ usuari: { ...getState().usuari, classe: "" } });
       getSocket().joinSala(this.codi, getState().usuari.nom, getState().usuari.avatar);
     },
     async pasteCode() {

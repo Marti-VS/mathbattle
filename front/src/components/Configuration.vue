@@ -85,28 +85,6 @@
                         </div>
                     </div>
                 </div>
-                <div v-show="avatarModal" key="2" max-width="600px">
-                    <div>
-                        <div class="headline">
-                            <p><b>Escull un avatar</b></p>
-
-                        </div>
-                        <button class="btnCloseAvatar" icon v-on:click="closeAvatarModal">
-                            <p>mdi-close</p>
-                        </button>
-                        <div>
-                            <div justify="center">
-                                <div v-for="avatarId in avatarIds" :key="avatarId" md="4" lg="3">
-                                    <div class="mx-auto" size="120" v-on:click="handleAvatarClick(avatarId)"
-                                        @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
-                                        <img :src="getAvatarUrl(avatarId)" alt="Avatar"
-                                            style="width: 100%; height: 100%;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -123,7 +101,6 @@ export default {
         return {
             dialog: false,
             errorMessage: "",
-            avatarModal: false,
             avatarIds: Array.from({ length: 40 }, (_, i) => i),
             name: "",
             surname: "",
@@ -193,27 +170,8 @@ export default {
             return `https://api.dicebear.com/7.x/big-smile/svg?seed=${avatarId}&scale=80`;
 
         },
-        closeAvatarModal() {
-            this.avatarModal = false;
-        },
-        handleAvatarClick(avatarId) {
-            this.avatar = avatarId;
-            setState({ usuari: { avatar: this.avatar } });
-            this.avatarModal = false;
-        },
-        handleMouseEnter(event) {
-            event.target.style.transform = 'scale(1.1)';
-            event.target.style.transition = 'transform 0.3s ease';
-            event.target.style.cursor = 'pointer';
-        },
-        handleMouseLeave(event) {
-            event.target.style.transform = 'scale(1)';
-            event.target.style.transition = 'transform 0.3s ease';
-            event.target.style.cursor = 'default';
-        },
         async cambiarContrasena() {
-            console.log("Dentro")
-            setState({ usuari: { email: this.email } });
+            setState({ usuari: { ...getState().usuari, email: this.email } });
 
             let response = await fetch(import.meta.env.PUBLIC_NODE + "/changePassword", {
                 method: "POST",

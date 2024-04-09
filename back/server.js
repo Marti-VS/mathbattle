@@ -25,7 +25,10 @@ const {
   login,
   register,
   changePassword,
-  getDificultats
+  getDificultats,
+  setAvatar,
+  buyedAvatars,
+  insertCompraAvatar
 } = require("./endpointFuncions.js");
 const { Server } = require("socket.io");
 const { log } = require("console");
@@ -251,6 +254,37 @@ app.get("/getDificultats", async (req, res) => {
       res.send(err);
     });
 });
+
+app.post("/comprarAvatar", async (req, res) => {
+  await insertCompraAvatar(req.body.id, req.body.idUsu)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+app.post("/equiparAvatar", async (req, res) => {
+  await setAvatar(req.body.id, req.body.idUsu)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+app.post("/verAvatares", async (req, res) => {
+  await buyedAvatars(req.body.idUsu)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
 
 function ejecutarEstadisticas(idClasse) {
 
