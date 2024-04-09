@@ -7,6 +7,7 @@ import Jugador from "../components/Jugador.vue";
 export default {
   data() {
     return {
+      sala: getSocket().joinedSala,
       myId: null,
       owner: false,
       kick: false,
@@ -29,10 +30,10 @@ export default {
     },
     leaveSala() {
       if (this.myId == this.sala.owner) {
-        this.socket.emit("leaveAllSala", {});
+        getSocket().leaveAllSalas();
         window.location.href = "/class";
       } else {
-        this.socket.emit("leaveSala", {});
+        getSocket().leaveAllSalas();
         window.location.href = "/join";
       }
     },
@@ -68,10 +69,6 @@ export default {
     Jugador,
   },
   computed: {
-    sala() {
-      this.myId = localStorage.getItem("socketId");
-      return getSocket().joinedSala;
-    },
     play() {
       return getSocket().play;
     },
@@ -105,11 +102,10 @@ export default {
     },
   },
   mounted() {
+    this.myId = localStorage.getItem("socketId");
     if (this.sala == null || this.sala == false) {
       getSocket().getSala(getState().usuari.id, getState().usuari.classe);
     } else {
-      console.log(this.sala.owner);
-      console.log(this.myId);
       if (getState().usuari.classe != "") {
         if (this.sala.id_classe != getState().usuari.classe) {
           getSocket().getSala(getState().usuari.id, getState().usuari.classe);
@@ -120,37 +116,33 @@ export default {
         }
       }
     }
-    subSocket((nuevoValor, antiguoValor) => {
-      console.log(nuevoValor.sala);
-      if (nuevoValor.sala == false || nuevoValor == null) {
-        setTimeout(() => {
-          window.location.href = "/join";
-        }, 3000);
-      } else {
-        if (nuevoValor.owner == this.myId) {
-          this.owner = true;
-        } else {
-          if (nuevoValor.owner_id == getState().usuari.id) {
-            this.owner = false;
-            this.kick = true;
-            setTimeout(() => {
-              window.location.href = "/join";
-            }, 3000);
-          }
-        }
-      }
-      if (
-        (nuevoValor.play == true && this.owner == false) ||
-        (nuevoValor.play == true && this.playProf == true)
-      ) {
-        window.location.href = "/game";
-      }
-
-      // this.socket.emit(
-      //   "changeAvatar",
-      //   this.sala.id_sala,
-      //   getState().usuari.avatar
-      // );
+    subSocket((state) => {
+      this.sala = state.joinedSala;
+      console.log(this.sala);
+      
+      // if (state.joinedSala == false || state.joinedSala == null) {
+      //   setTimeout(() => {
+      //     window.location.href = "/join";
+      //   }, 3000);
+      // } else {
+      //   if (state.joinedSala.owner == this.myId) {
+      //     this.owner = true;
+      //   } else {
+      //     if (state.joinedSala.owner_id == getState().usuari.id) {
+      //       this.owner = false;
+      //       this.kick = true;
+      //       setTimeout(() => {
+      //         window.location.href = "/join";
+      //       }, 3000);
+      //     }
+      //   }
+      // }
+      // if (
+      //   (state.play == true && this.owner == false) ||
+      //   (state.play == true && this.playProf == true)
+      // ) {
+      //   window.location.href = "/game";
+      // }
     })
   },
 };

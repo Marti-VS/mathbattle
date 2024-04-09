@@ -56,8 +56,14 @@ export const useSocketStore = createStore(
             codi: codi,
             username: username,
             idAvatar: idAvatar,
-          });
+          }, socket.id);
       },
+      leaveSala: () => {
+        socket.emit("leaveSala", {});
+      },
+      leaveAllSalas: () => {
+        socket.emit("leaveAllSala", {});
+      }
     }),
     {
       name: "socketStore",
@@ -99,9 +105,9 @@ socket.on("actualizarOperacion", (data) => {
   }));
 });
 
-socket.on("join", (data) => {
-    console.log(data);
-  useSocketStore.setState((state) => ({
+socket.on("join", async (data) => {
+  console.log(data);
+  await useSocketStore.setState((state) => ({
     ...state,
     joinedSala: data,
     play: false,

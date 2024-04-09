@@ -16,6 +16,7 @@ let salas = [];
 let partidas = [];
 let countSala = 0;
 let countPartida = 1;
+let idSockets = {};
 
 function sendPartidas(owner, id, io) {
   const partidasSala = partidas.filter((partida) => partida.idSala == id);
@@ -25,7 +26,10 @@ function sendPartidas(owner, id, io) {
     let sala = salas.filter((sala) => sala.id_sala == id);
     if (sala[0]) {
       for (let i = 0; i < sala[0].jugadores.length; i++) {
-        io.to(sala[0].jugadores[i].id_jugador).emit("getPartidas", partidasSala);
+        io.to(sala[0].jugadores[i].id_jugador).emit(
+          "getPartidas",
+          partidasSala
+        );
       }
     }
   }
@@ -45,8 +49,13 @@ function crearPartida(user, jugador) {
 
 function sockets(io) {
   io.on("connection", (socket) => {
-    socket.on('socketId', (id) => {
+    socket.on("socketId", (id) => {
       socket.join(id);
+      if (!idSockets[id]) {
+        idSockets[id] = [];
+      }
+      idSockets[id].push(socket.id);
+      console.log("con: "+ idSockets[id] +" - " + id);
     });
 
     socket.on("conectarUsuario", (user) => {
@@ -57,9 +66,19 @@ function sockets(io) {
       changeDificulty(idPartida, idJugador, dificultad);
     });
 
-    socket.on("solveOperation", ({ idPartida, idJugador, idUsuari, idClasse, result }) => {
-      solveOperation(idPartida, idJugador, idUsuari, idClasse, result, socket.id);
-    });
+    socket.on(
+      "solveOperation",
+      ({ idPartida, idJugador, idUsuari, idClasse, result }) => {
+        solveOperation(
+          idPartida,
+          idJugador,
+          idUsuari,
+          idClasse,
+          result,
+          socket.id
+        );
+      }
+    );
 
     socket.on("createSala", (idClasse, socketId, idUser) => {
       crearSala(idClasse, socketId, idUser);
@@ -73,13 +92,15 @@ function sockets(io) {
       changeAvatar(idSocket, socket.id, avatar);
     });
 
-    socket.on("joinSala", (userInfo) => {
-      joinSala(userInfo, socket.id);
+    socket.on("joinSala", (userInfo, socketId) => {
+      console.log(socketId);
+      joinSala(userInfo, socketId);
     });
 
     socket.on("startGame", (startGameInfo) => {
       const sala = salas.find(
-        (sala) => sala.owner == socket.id && sala.id_classe == startGameInfo.idClasse
+        (sala) =>
+          sala.owner == socket.id && sala.id_classe == startGameInfo.idClasse
       );
 
       let totalPlayers = sala.jugadores.length;
@@ -88,13 +109,19 @@ function sockets(io) {
       }
 
       for (let i = 0; i < totalPlayers; i++) {
-        io.to(sala.jugadores[i].id_jugador).emit("getGame", { idSala: sala.id_sala, play: true });
+        io.to(sala.jugadores[i].id_jugador).emit("getGame", {
+          idSala: sala.id_sala,
+          play: true,
+        });
       }
 
       if (sala.jugadores.length % 2 != 0 && startGameInfo.playProf == true) {
         io.to(sala.owner).emit("getGame", { idSala: sala.id_sala, play: true });
       } else {
-        io.to(sala.owner).emit("getGame", { idSala: sala.id_sala, play: false });
+        io.to(sala.owner).emit("getGame", {
+          idSala: sala.id_sala,
+          play: false,
+        });
       }
     });
 
@@ -107,9 +134,21 @@ function sockets(io) {
     });
 
     socket.on("disconnect", () => {
-      desconectarJugador(socket.id);
-    });
 
+      const id = Object.keys(idSockets).find(id => idSockets[id].includes(socket.id));
+      
+      if (id) {
+        idSockets[id].splice(idSockets[id].indexOf(socket.io), 1);
+      }
+      
+      setTimeout(() => {
+        console.log("des: "+ idSockets[id] +" - " + id);
+        if (idSockets[id].length <= 0) {
+          console.log("borrat");
+          desconectarJugador(id);
+        }
+      }, 1000);
+    });
   });
 
   function desconectarTodosJugadores(id) {
@@ -125,15 +164,15 @@ function sockets(io) {
     }
   }
 
-  function desconectarJugador(socket) {
+  function desconectarJugador(socketId) {
     for (let i = 0; i < salas.length; i++) {
       let sala = salas[i];
       const indexJugador = sala.jugadores.findIndex(
-        (jugador) => jugador.id_jugador == socket
+        (jugador) => jugador.id_jugador == socketId
       );
 
-      if (sala.owner == socket) {
-        desconectarTodosJugadores(socket);
+      if (sala.owner == socketId) {
+        desconectarTodosJugadores(socketId);
       }
 
       if (indexJugador !== -1) {
@@ -210,7 +249,9 @@ function sockets(io) {
             salaEncontrada
           );
         }
-        const partidasSala = partidas.filter((partida) => partida.idSala == salaEncontrada.id_sala);
+        const partidasSala = partidas.filter(
+          (partida) => partida.idSala == salaEncontrada.id_sala
+        );
         if (partidasSala) {
           io.to(id).emit("getPartidas", partidasSala);
         }
@@ -259,11 +300,11 @@ function sockets(io) {
     if (sala) {
       let previusOwner = sala.owner;
       sala.owner = idSocket;
-      setTimeout(() =>{
+      setTimeout(() => {
         console.log(sala.owner);
         io.to(sala.owner).emit("join", sala);
         io.to(previusOwner).emit("join", sala);
-      },3000);
+      }, 3000);
 
       sendPartidas(sala.owner, sala.id_sala, io);
     } else {
@@ -280,7 +321,14 @@ function sockets(io) {
     return codigo;
   }
 
-  function solveOperation(idPartida, idJugador, idUsuari, idClasse, result, idSocket) {
+  function solveOperation(
+    idPartida,
+    idJugador,
+    idUsuari,
+    idClasse,
+    result,
+    idSocket
+  ) {
     let correcto = false;
     const partida = partidas.find((p) => p.idPartida == idPartida);
     let realResult = null;
@@ -293,7 +341,7 @@ function sockets(io) {
           realResult = parseFloat(
             eval(partida.jugadores[idJugador].operacion[dificultad]).toFixed(2)
           );
-        } catch (e) { }
+        } catch (e) {}
         console.log(realResult);
         if (realResult == result) {
           correcto = true;
@@ -442,7 +490,8 @@ function sockets(io) {
     }
 
     if (partida) {
-      const vidaActual = idJugador == 1 ? partida.jugadores[0].vida : partida.jugadores[1].vida;
+      const vidaActual =
+        idJugador == 1 ? partida.jugadores[0].vida : partida.jugadores[1].vida;
       const nuevaVida = Math.max(0, vidaActual - cantidad);
       let sala = salas.find((sala) => sala.id_sala == partida.idSala);
 
