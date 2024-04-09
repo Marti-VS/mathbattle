@@ -278,7 +278,6 @@ app.post("/equiparAvatar", async (req, res) => {
 app.post("/verAvatares", async (req, res) => {
   await buyedAvatars(req.body.idUsu)
     .then((data) => {
-      console.log(data);
       res.send(data);
     })
     .catch((err) => {

@@ -282,7 +282,6 @@ function buyedAvatars(idUsu) {
         reject({ error: err });
       } else {
         resolve(result);
-        console.log(result);
       }
     });
   });
