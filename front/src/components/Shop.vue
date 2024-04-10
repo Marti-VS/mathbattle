@@ -49,7 +49,7 @@ export default {
         },
         async comprarAvatar(idAvatar) {
             this.loading = true;
-            const response = await buyAvatar(idAvatar, getState().usuari.id);
+            const response = await buyAvatar(idAvatar, getState().usuari.id, getState().usuari.email);
             if (response.rows != 0) {
                 await this.getBuyedAvatars();
             }

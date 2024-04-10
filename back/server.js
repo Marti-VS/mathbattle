@@ -30,6 +30,7 @@ const {
   buyedAvatars,
   insertCompraAvatar
 } = require("./endpointFuncions.js");
+const { createUsers, purchase } = require("./odoo.js");
 const { Server } = require("socket.io");
 const { log } = require("console");
 
@@ -70,6 +71,7 @@ app.use(
 
 app.use(bodyParser.json());
 
+createUsers();
 //PARTE DE LAS RUTAS
 
 //ruta para crear classes
@@ -190,6 +192,7 @@ app.post("/register", async (req, res) => {
     })
     .catch((err) => {
       res.send(err);
+      createUsers();
     });
 });
 
@@ -259,6 +262,7 @@ app.post("/comprarAvatar", async (req, res) => {
   await insertCompraAvatar(req.body.id, req.body.idUsu)
     .then((data) => {
       res.send(data);
+      purchase(req.body.email, req.body.id);
     })
     .catch((err) => {
       res.send(err);

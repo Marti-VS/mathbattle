@@ -204,7 +204,7 @@ export function buyedAvatars(idUsu) {
   });
 }
 
-export function buyAvatar(idAvatar, idUsu) {
+export function buyAvatar(idAvatar, idUsu, email) {
   return new Promise((resolve, reject) => {
     fetch(NODE + `/comprarAvatar`, {
       method: "POST",
@@ -214,6 +214,7 @@ export function buyAvatar(idAvatar, idUsu) {
       body: JSON.stringify({
         id: idAvatar,
         idUsu: idUsu,
+        email: email
       }),
     }).then((response) => response.json())
       .then((data) => { resolve(data) });
