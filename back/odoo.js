@@ -17,8 +17,9 @@ const odoo = new Odoo({
     url: "http://mathbattle.aws.dam.inspedralbes.cat/",
     port: 80,
     db: "TR3CONTRA",
-    username: "a21marsalval@inspedralbes.cat",
-    password: "TR3CONTRA"
+    username: "info@mathbattle.aws.dam.inspedralbes.cat",
+    password: "TR3CONTRA",
+    allow_none: true
 });
 
 function createUsers() {
@@ -110,11 +111,11 @@ function searchAllUsers() {
 function purchase(email, purchaseNumber) {
     odoo.connect(async function (err) {
         try {
-            const clientId = await findClientIdByEmail(email);
+            const client = await findClientIdByEmail(email);
 
-            if (clientId) {
+            if (client) {
                 // Crear la compra para el cliente con el número especificado
-                const purchaseId = await createPurchase(clientId, purchaseNumber);
+                const purchaseId = await createPurchase(client.id, client.email, purchaseNumber);
                 console.log(`Compra creada para cliente (${email}): ${purchaseId}`);
             } else {
                 console.log(`Cliente no encontrado con el correo electrónico: ${email}`);
@@ -139,7 +140,7 @@ async function findClientIdByEmail(email) {
                 if (partners != null) {
                     for (let i = 0; i < partners.length; i++) {
                         if (partners[i].email === email) {
-                            resolve(partners[i].id);
+                            resolve({ id: partners[i].id, email: partners[i].email });
                             i = partners.length;
                         }
                     }
@@ -149,7 +150,7 @@ async function findClientIdByEmail(email) {
     });
 }
 
-async function createPurchase(clientId, purchaseNumber) {
+async function createPurchase(clientId, clientEmail, purchaseNumber) {
     return new Promise((resolve, reject) => {
         const productDetails = {
             id: purchaseNumber + 1,
@@ -181,11 +182,61 @@ async function createPurchase(clientId, purchaseNumber) {
                     // Manejar el error al crear la orden de venta
                 } else {
                     console.log('Orden de venta creada con ID:', saleId);
-                    // Resolver una promesa, si es necesario, con el ID de la orden de venta creada
+                    enviarEmail(clientEmail, productDetails.name, saleId);
                 }
             }
         );
     });
+}
+
+function enviarEmail(clientEmail, productName, orderId) {
+    // Datos de correo electrónico
+    const emailData = {
+        email_from: "a21dambrecer@inspedralbes.cat",
+        email_to: clientEmail,
+        subject: 'Confirmación de Pedido',
+        body_html: `<p>Hola Cliente,</p>
+                    <p>Tu pedido con el ID ${productName} ha sido confirmado.</p>
+                    <p>Gracias por tu compra.</p>`
+    };
+
+    // Llamada XML-RPC para enviar el correo electrónico
+    odoo.execute_kw('mail.mail', 'create', [[emailData]], function (err, mailId) {
+        if (err) {
+            console.error('Error al crear el correo electrónico:', err);
+        } else {
+            console.log('Correo electrónico creado correctamente. ID:', mailId);
+
+            // Enviar el correo electrónico creado
+            odoo.execute_kw('mail.mail', 'send', [[mailId]], function (err, result) {
+                if (err) {
+                } else {
+                    console.log('Correo electrónico enviado correctamente.');
+                }
+            });
+        }
+    });
+
+
+    // Ejecutar la acción de enviar correo electrónico asociada a la orden de venta
+    // odoo.execute_kw('sale.order', 'action_confirm', [[orderId]], function (err, result) {
+    //     if (err) {
+    //         console.error('Error al confirmar la orden de venta:', err);
+    //     } else {
+    //         console.log('Orden de venta confirmada correctamente.');
+
+    //         // Si se proporciona un correo electrónico, enviar el correo asociado a la orden
+    //         if (emailAddress) {
+    //             odoo.execute_kw('sale.order', 'action_quotation_send', [[orderId]], function (err, result) {
+    //                 if (err) {
+    //                     console.error('Error al enviar el correo electrónico:', err);
+    //                 } else {
+    //                     console.log('Correo electrónico enviado correctamente.');
+    //                 }
+    //             });
+    //         }
+    //     }
+    // });
 }
 
 module.exports = {
