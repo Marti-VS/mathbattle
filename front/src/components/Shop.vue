@@ -71,6 +71,7 @@ export default {
 
             setState({ usuari: { ...getState().usuari, buyedAvatars: booleanArray } });
             this.contentLoad = true;
+            console.log(this.contentLoad);
             console.log(getState().usuari.buyedAvatars);
         }
     },
@@ -87,12 +88,12 @@ export default {
                 <button v-on:click="dialog = !dialog"
                     class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden bg-white"
                     variant="text" icon="" size="large">
-                    <img :src="avatars[getState().usuari.avatar].image" class="scale-150"></img>
+                    <img :src="avatars[getState().usuari.avatar].image" class="scale-150" />
                 </button>
                 <div v-show="dialog" activator="info-svg">
                     <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
                     <div class="relative bg-white rounded-xl shadow-xl pt-8 pb-6 px-4 z-50 top-10">
-                        <h1 className="text-2xl ml-3">Shop Avatars</h1>
+                        <h1 className="text-2xl ml-3 font-bold text-center">Botiga d'Avatars</h1>
                         <div class="grid grid-cols-3 gap-6 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-6">
                             <!-- Render cards in a grid of 3 columns -->
                             <div v-for="(avatar, index) in avatars" :key="index">
@@ -104,7 +105,7 @@ export default {
                                         :style="{ aspectRatio: avatar.aspectRatio, objectFit: 'cover' }"
                                         :width="avatar.size" />
                                 </div>
-                                <div class="flex items-center justify-center p-4" v-if="contentLoad">
+                                <div class="flex items-center justify-center p-4">
                                     <button
                                         v-if="getState().usuari.avatar != index && loading == false && getState().usuari.buyedAvatars[index] == true"
                                         v-on:click="equiparAvatar(index)"

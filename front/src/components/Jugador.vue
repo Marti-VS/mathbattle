@@ -1,3 +1,8 @@
+<script setup>
+import Calculin from '../assets/pink.png'
+import Geometrado from '../assets/white.png'
+import Fraccionado from '../assets/blue.png'
+</script>
 <script>
 
 export default {
@@ -20,7 +25,7 @@ export default {
             <p>{{ jugador.wins }}</p>
         </div>
         <img style="height: 100px;" class="img-avatar"
-            :src='"https://api.dicebear.com/7.x/big-smile/svg?seed=" + jugador.id_avatar' />
+            :src='jugador.id_avatar == 0 ? Calculin.src : jugador.id_avatar == 1 ? Geometrado.src : Fraccionado.src' />
         <h3>{{ jugador.nombre }}</h3>
     </div>
 </template>

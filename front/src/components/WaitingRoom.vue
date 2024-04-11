@@ -26,7 +26,7 @@ export default {
         this.canPlayModal = true;
         return;
       }
-      getSocket().startGame(idClasse, playProf);
+      getSocket().startGame(getState().usuari.classe, this.playProf);
     },
     leaveSala() {
       if (this.myId == this.sala.owner) {
@@ -117,31 +117,32 @@ export default {
       }
     }
     subSocket((state) => {
+      console.log("STATE", state);
       this.sala = state.joinedSala;
-      
-      // if (state.joinedSala == false || state.joinedSala == null) {
-      //   setTimeout(() => {
-      //     window.location.href = "/join";
-      //   }, 3000);
-      // } else {
-      //   if (state.joinedSala.owner == this.myId) {
-      //     this.owner = true;
-      //   } else {
-      //     if (state.joinedSala.owner_id == getState().usuari.id) {
-      //       this.owner = false;
-      //       this.kick = true;
-      //       setTimeout(() => {
-      //         window.location.href = "/join";
-      //       }, 3000);
-      //     }
-      //   }
-      // }
-      // if (
-      //   (state.play == true && this.owner == false) ||
-      //   (state.play == true && this.playProf == true)
-      // ) {
-      //   window.location.href = "/game";
-      // }
+      if (state.joinedSala == false || state.joinedSala == null) {
+        setTimeout(() => {
+          window.location.href = "/join";
+        }, 3000);
+      } else {
+        if (state.joinedSala.owner == this.myId) {
+          this.owner = true;
+        } else {
+          if (state.joinedSala.owner_id == getState().usuari.id) {
+            this.owner = false;
+            this.kick = true;
+            setTimeout(() => {
+              window.location.href = "/join";
+            }, 3000);
+          }
+        }
+      }
+
+      if (
+        (state.play == true && this.owner == false) ||
+        (state.play == true && this.playProf == true)
+      ) {
+        window.location.href = "/game";
+      }
     })
   },
 };
@@ -149,7 +150,7 @@ export default {
 
 <template>
   <div class="h-screen flex flex-col items-center justify-center">
-    <div class="full-container" v-if="sala && kick == false">
+    <div class="full-container" v-if="sala && !kick">
       <div class="button_leave">
         <button @click="leaveSala()">
           <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
