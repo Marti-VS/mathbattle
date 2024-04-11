@@ -1,3 +1,9 @@
+<script setup>
+import Calculin from "../assets/pink.png";
+import Fraccionado from "../assets/blue.png";
+import Geometrado from "../assets/white.png";
+</script>
+
 <script>
 export default {
   props: ["partida"],
@@ -8,8 +14,11 @@ export default {
 <template>
   <div class="container" v-if="partida.jugadores != undefined" :key="partida.idPartida">
     <div class="player-container-mini">
-      <img style="height: 100px;" class="img-avatar-mini" :src="'https://api.dicebear.com/7.x/big-smile/svg?seed=' +
-    partida.jugadores[0]?.avatar
+      <img style="height: 100px;" class="img-avatar-mini" :src="partida.jugadores[0].avatar == 0
+                ? Calculin.src
+                : partida.jugadores[0].avatar == 1
+                ? Geometrado.src
+                : Fraccionado.src
     " />
       <h4>
         {{ partida.jugadores[0]?.username }}
@@ -22,8 +31,11 @@ export default {
     </div>
     <h2>VS</h2>
     <div class="player-container-mini">
-      <img style="height: 100px;" class="img-avatar-mini" :src="'https://api.dicebear.com/7.x/big-smile/svg?seed=' +
-    partida.jugadores[1]?.avatar
+      <img style="height: 100px;" class="img-avatar-mini" :src="partida.jugadores[1].avatar == 0
+                ? Calculin.src
+                : partida.jugadores[1].avatar == 1
+                ? Geometrado.src
+                : Fraccionado.src
     " />
       <h4>
         {{ partida.jugadores[1]?.username }}

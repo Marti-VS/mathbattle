@@ -3,10 +3,11 @@ import Configuration from "../components/Configuration.vue";
 import Information from "../components/Information.vue";
 import MainLayout from "../layouts/MainLayout.astro";
 import WaitingRoom from "../components/WaitingRoom.vue";
+import Shop from "../components/Shop.vue";
 ---
 
 <MainLayout>
-  <Information client:visible />
   <Configuration client:visible />
+  <Shop client:only="vue" />
   <WaitingRoom client:only="vue" />
 </MainLayout>

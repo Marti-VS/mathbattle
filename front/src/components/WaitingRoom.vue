@@ -1,5 +1,5 @@
 <script>
-import { getState as getSocket, subscribe as subSocket } from "../store/socketStore.js";
+import { getState as getSocket, setState as setSocket , subscribe as subSocket } from "../store/socketStore.js";
 import { getState } from "../store/store.js";
 import PlayersVS from "../components/PlayersVS.vue";
 import Jugador from "../components/Jugador.vue";
@@ -13,6 +13,7 @@ export default {
       kick: false,
       playing: false,
       partidasFiltradas: [],
+      partida : null,
       playProf: false,
       canPlay: false,
       canPlayModal: false,
@@ -33,7 +34,7 @@ export default {
         getSocket().leaveAllSalas();
         window.location.href = "/class";
       } else {
-        getSocket().leaveAllSalas();
+        getSocket().leaveSala();
         window.location.href = "/join";
       }
     },
@@ -62,15 +63,6 @@ export default {
           });
         }
       }
-    },
-  },
-  components: {
-    PlayersVS,
-    Jugador,
-  },
-  computed: {
-    play() {
-      return getSocket().play;
     },
     partidas() {
       let partidasFiltro = getSocket().partidas;
@@ -101,6 +93,16 @@ export default {
       return getSocket().partidas;
     },
   },
+  components: {
+    PlayersVS,
+    Jugador,
+  },
+  computed: {
+    play() {
+      return getSocket().play;
+    },
+    
+  },
   mounted() {
     this.myId = localStorage.getItem("socketId");
     if (this.sala == null || this.sala == false) {
@@ -116,8 +118,8 @@ export default {
         }
       }
     }
+
     subSocket((state) => {
-      console.log("STATE", state);
       this.sala = state.joinedSala;
       if (state.joinedSala == false || state.joinedSala == null) {
         setTimeout(() => {
@@ -143,6 +145,8 @@ export default {
       ) {
         window.location.href = "/game";
       }
+
+      this.partidas();
     })
   },
 };
@@ -249,7 +253,7 @@ export default {
           </svg>
         </button>
       </div>
-      <h2 class="text-5xl font-bold">El Professor ha tancat la Sala</h2>
+      <h2 class="text-5xl font-bold">Carregant...</h2>
       <div class="progress-loader">
         <div class="progress"></div>
       </div>

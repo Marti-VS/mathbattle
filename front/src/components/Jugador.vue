@@ -21,7 +21,7 @@ export default {
 <template>
     <div class="jugador">
         <div class="winner" v-if="jugador.wins">
-            <span class="icon-[mdi--crown] size-3 text-yellow-300"></span>
+            <span class="icon-[mdi--crown] size-5 text-orange-500"></span>
             <p>{{ jugador.wins }}</p>
         </div>
         <img style="height: 100px;" class="img-avatar"

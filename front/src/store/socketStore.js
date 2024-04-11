@@ -5,17 +5,6 @@ import io from "socket.io-client";
 
 const socket = io(import.meta.env.PUBLIC_NODE);
 
-socket.on("connect", () => {
-    if (typeof window !== "undefined") {
-        if (!localStorage.getItem('socketId')) {
-            localStorage.setItem('socketId', socket.id);
-        } else {
-            socket.id = localStorage.getItem('socketId');
-        }
-    }
-    socket.emit("socketId", socket.id);
-});
-
 export const useSocketStore = createStore(
   persist(
     (set) => ({
@@ -79,7 +68,6 @@ export const useSocketStore = createStore(
         });
       },
       solveOperation: (idPartida, idJugador, idUsuari, idClasse, result, socketId) => {
-        console.log(result);
         socket.emit("solveOperation", {
           idPartida: idPartida,
           idJugador: idJugador,
@@ -97,8 +85,18 @@ export const useSocketStore = createStore(
   )
 );
 
+socket.on("connect", () => {
+  if (typeof window !== "undefined") {
+      if (!localStorage.getItem('socketId')) {
+          localStorage.setItem('socketId', socket.id);
+      } else {
+          socket.id = localStorage.getItem('socketId');
+      }
+  }
+  socket.emit("socketId", socket.id);
+});
+
 socket.on("enviaJson", (data) => {
-  console.log(data);
   useSocketStore.setState((state) => ({
     ...state,
     play: false,
@@ -133,7 +131,6 @@ socket.on("actualizarOperacion", (data) => {
 });
 
 socket.on("join", async (data) => {
-  console.log(data);
   await useSocketStore.setState((state) => ({
     ...state,
     joinedSala: data,
@@ -168,6 +165,11 @@ socket.on("finishGame", () => {
       status: "error",
     },
   }));
+});
+
+socket.on("disconnect" , () => {
+  const { setState } = useSocketStore;
+  setState({ joinedSala: null, partida: null, partidas: null});
 });
 
 export const { getState, setState, subscribe } = useSocketStore;

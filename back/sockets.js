@@ -67,7 +67,7 @@ function sockets(io) {
 
     socket.on(
       "solveOperation",
-      ({ idPartida, idJugador, idUsuari, idClasse, result }) => {
+      ({ idPartida, idJugador, idUsuari, idClasse, result, socketId }) => {
         solveOperation(
           idPartida,
           idJugador,
@@ -125,11 +125,11 @@ function sockets(io) {
     });
 
     socket.on("leaveSala", () => {
-      desconectarJugador(socket.id);
+      desconectarJugador(getSocketId(socket.id));
     });
 
     socket.on("leaveAllSala", () => {
-      desconectarTodosJugadores(socket.id);
+      desconectarTodosJugadores(getSocketId(socket.id));
     });
 
     socket.on("disconnect", () => {
@@ -337,9 +337,9 @@ function sockets(io) {
     result,
     idSocket
   ) {
-    console.log(result);
     let correcto = false;
     const partida = partidas.find((p) => p.idPartida == idPartida);
+
     let realResult = null;
 
     if (partida != undefined) {
@@ -416,11 +416,14 @@ function sockets(io) {
     }
 
     partida.jugadores[idJugador].operacion = operacionEval;
+    
+      io.to(partida.jugadores[idJugador].idSocket).emit("actualizarOperacion", {
+        operacion: operacionesGuardar,
+        jugador: idJugador == 1 ? 1 : 0,
+      });
 
-    io.to(partida.jugadores[idJugador].idSocket).emit("actualizarOperacion", {
-      operacion: operacionesGuardar,
-      jugador: idJugador == 1 ? 1 : 0,
-    });
+    
+    
   }
 
   function saveGameData(idUsu, idClasse, dificultat) {
@@ -484,6 +487,7 @@ function sockets(io) {
 
   // Función para disminuir la vida de un jugador en una partida
   function disminuirVida(idPartida, idJugador) {
+    
     let partida = partidas.find((p) => p.idPartida == idPartida);
 
     switch (partida.jugadores[idJugador].dificultad) {
@@ -503,11 +507,13 @@ function sockets(io) {
         idJugador == 1 ? partida.jugadores[0].vida : partida.jugadores[1].vida;
       const nuevaVida = Math.max(0, vidaActual - cantidad);
       let sala = salas.find((sala) => sala.id_sala == partida.idSala);
-
+      console.log(salas);
+      console.log(partida.idSala);
       partida.jugadores[idJugador == 1 ? 0 : 1].vida = nuevaVida;
       if (sala) {
         sendPartidas(sala.owner, sala.id_sala, io);
         for (let i = 0; i < partida.jugadores.length; i++) {
+          console.log(partida.jugadores[i].idSocket);
           io.to(partida.jugadores[i].idSocket).emit("actualizarVida", {
             vida: nuevaVida,
             jugador: idJugador == 1 ? 0 : 1,
@@ -518,6 +524,7 @@ function sockets(io) {
           partida.status = "finish";
           sendPartidas(sala.owner, sala.id_sala, io);
           for (let i = 0; i < partida.jugadores.length; i++) {
+            
             io.to(partida.jugadores[i].idSocket).emit("enviaJson", partida);
           }
         }
@@ -534,10 +541,12 @@ function sockets(io) {
 
     if (partidas[idPartidaIndex].jugadores.length == 2) {
       for (let i = 0; i < partidas[idPartidaIndex].jugadores.length; i++) {
+        setTimeout(() => {
         io.to(partidas[idPartidaIndex].jugadores[i].idSocket).emit(
           "enviaJson",
           partidas[idPartidaIndex]
         );
+        },300 );
       }
     }
 
@@ -551,17 +560,17 @@ function sockets(io) {
     }
   }
 
-  function joinPartida(user) {
+  function joinPartida(user, idSocket) {
     let partidaId = countPartida;
 
     let jugador = {
-      idSocket: user.username.idSocket,
-      username: user.username.username,
+      idSocket: idSocket,
+      username: user.username,
       vida: 100,
       operacion: "",
       resultadoJugador: null,
       dificultad: 1,
-      avatar: user.username.avatar,
+      avatar: user.avatar,
     };
 
     if (partidas.length == 0) {
@@ -593,7 +602,7 @@ function sockets(io) {
       (partida) => partida.idPartida == partidaId
     );
     let idJugador = partidas[partidaIndex].jugadores.findIndex(
-      (jugador) => jugador.idSocket == user.username.idSocket
+      (jugador) => jugador.idSocket == idSocket
     );
 
     getOperation(partidaId, idJugador, 1);

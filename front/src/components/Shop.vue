@@ -68,26 +68,22 @@ export default {
             });
 
             booleanArray[0] = true;
-
             setState({ usuari: { ...getState().usuari, buyedAvatars: booleanArray } });
             this.contentLoad = true;
-            console.log(this.contentLoad);
-            console.log(getState().usuari.buyedAvatars);
         }
     },
     mounted() {
-        console.log(getState().usuari);
         this.getBuyedAvatars();
     }
 };
 </script>
 
-<template>
-    <div class="div-gear">
-        <div class="absolute top-0 right-0 mt-8 md:mr-[155px] mr-[100px]">
+<template v-if="contentLoad">
+    <div>
+        <div class="absolute top-0 right-0 mt-8 md:mr-[105px] mr-[100px]">
             <div>
                 <button v-on:click="dialog = !dialog"
-                    class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden bg-white"
+                    class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden border-[2px] border-white"
                     variant="text" icon="" size="large">
                     <img :src="avatars[getState().usuari.avatar].image" class="scale-150" />
                 </button>
