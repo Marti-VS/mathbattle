@@ -74,7 +74,7 @@ function sockets(io) {
           idUsuari,
           idClasse,
           result,
-          socket.id
+          socketId
         );
       }
     );
@@ -96,7 +96,6 @@ function sockets(io) {
     });
 
     socket.on("startGame", (startGameInfo) => {
-      console.log(getSocketId(socket.id));
       const sala = salas.find(
         (sala) =>
           sala.owner == getSocketId(socket.id) &&
@@ -172,7 +171,6 @@ function sockets(io) {
   }
 
   function desconectarJugador(socketId) {
-    console.log("desconectat");
     for (let i = 0; i < salas.length; i++) {
       let sala = salas[i];
       const indexJugador = sala.jugadores.findIndex(
@@ -296,7 +294,6 @@ function sockets(io) {
 
       countSala++;
       salas.push(sala);
-      console.log(salas);
       io.to(socketId).emit("join", sala);
     }
   }
@@ -313,7 +310,6 @@ function sockets(io) {
       let previusOwner = sala.owner;
       sala.owner = idSocket;
       setTimeout(() => {
-        console.log(sala.owner);
         io.to(sala.owner).emit("join", sala);
         io.to(previusOwner).emit("join", sala);
       }, 3000);
@@ -341,6 +337,7 @@ function sockets(io) {
     result,
     idSocket
   ) {
+    console.log(result);
     let correcto = false;
     const partida = partidas.find((p) => p.idPartida == idPartida);
     let realResult = null;
@@ -554,17 +551,17 @@ function sockets(io) {
     }
   }
 
-  function joinPartida(user, idSocket) {
+  function joinPartida(user) {
     let partidaId = countPartida;
 
     let jugador = {
-      idSocket: idSocket,
-      username: user.username,
+      idSocket: user.username.idSocket,
+      username: user.username.username,
       vida: 100,
       operacion: "",
       resultadoJugador: null,
       dificultad: 1,
-      avatar: user.avatar,
+      avatar: user.username.avatar,
     };
 
     if (partidas.length == 0) {
@@ -596,7 +593,7 @@ function sockets(io) {
       (partida) => partida.idPartida == partidaId
     );
     let idJugador = partidas[partidaIndex].jugadores.findIndex(
-      (jugador) => jugador.idSocket == idSocket
+      (jugador) => jugador.idSocket == user.username.idSocket
     );
 
     getOperation(partidaId, idJugador, 1);

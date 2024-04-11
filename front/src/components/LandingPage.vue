@@ -19,20 +19,10 @@ import Image from '../assets/MathBattleLogo.png'
 
 <script>
 export default {
-  data() {
-    return {
-      state: getState(),
-    };
-  },
   computed: {
     goTo() {
-      return this.state.usuari.id == null ? "/login" : "/join";
+      return getState().usuari.id == null ? "/login" : "/join";
     },
   },
 };
 </script>
-
-<style scoped>
-
-
-</style>

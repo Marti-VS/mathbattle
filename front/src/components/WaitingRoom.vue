@@ -26,7 +26,7 @@ export default {
         this.canPlayModal = true;
         return;
       }
-      getSocket().startGame(getState().usuari.classe, this.playProf);
+      getSocket().startGame(getState().usuari.classe, this.playProf, localStorage.getItem("socketId"));
     },
     leaveSala() {
       if (this.myId == this.sala.owner) {

@@ -39,11 +39,11 @@ export const useSocketStore = createStore(
       play: false,
       sala: null,
       partidas: null,
-      startGame: (idClasse, playProf) => {
+      startGame: (idClasse, playProf, socketId) => {
         socket.emit("startGame", {
           idClasse: idClasse,
           playProf: playProf,
-        });
+        }, socketId);
       },
       getSala: (id, classe) => {
         socket.emit("getSala", localStorage.getItem('socketId'), id, classe);
@@ -78,13 +78,15 @@ export const useSocketStore = createStore(
           dificultad: dificultad,
         });
       },
-      solveOperation: (idPartida, idJugador, idUsuari, idClasse, result) => {
+      solveOperation: (idPartida, idJugador, idUsuari, idClasse, result, socketId) => {
+        console.log(result);
         socket.emit("solveOperation", {
           idPartida: idPartida,
           idJugador: idJugador,
           idUsuari: idUsuari,
           idClasse: idClasse,
           result: result,
+          socketId: socketId,
         });
       }
 

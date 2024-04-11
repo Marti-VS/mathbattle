@@ -1,5 +1,5 @@
 <script setup>
-import { getState, setState, subscribe } from "../store/store.js";
+import { getState, setState } from "../store/store.js";
 </script>
 <script>
 import Calculin from '../assets/pink.png'
@@ -76,6 +76,7 @@ export default {
         }
     },
     mounted() {
+        console.log(getState().usuari);
         this.getBuyedAvatars();
     }
 };

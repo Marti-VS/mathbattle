@@ -34,7 +34,7 @@ export default {
     };
   },
   mounted() {
-    getState().usuari.id == null ? window.location.href = "/inici" : null;
+    getState().usuari.id == null ? (window.location.href = "/inici") : null;
     this.conectar();
 
     this.setPartida;
@@ -66,12 +66,14 @@ export default {
     },
     solveOperation() {
       if (getSocket().joinedSala) {
+        console.log(this.result);
         getSocket().solveOperation({
           idPartida: getSocket().partida.idPartida,
           idJugador: this.idPlayer,
           idUsuari: getState().usuari.id,
           idClasse: getSocket().joinedSala.id_classe,
           result: this.result,
+          idSocket: localStorage.getItem("socketId"),
         });
         if (
           this.result !=
@@ -106,8 +108,6 @@ export default {
         getSocket().partida.status = "";
         this.$router.push("/sala");
       }
-
-      console.log(getSocket().partida);      
       this.idPlayer =
         getSocket().partida.jugadores.findIndex(
           (jugador) => jugador.idSocket == localStorage.getItem("socketId")
@@ -173,11 +173,9 @@ export default {
 
 <template>
   <div v-if="setPartida">
-    <div
-      class="px-12 py-5 grid grid-cols-2 text-2xl font-bold"
-    >
+    <div class="px-12 py-5 grid grid-cols-2 text-2xl font-bold">
       <div class="w-full">
-        <h2>{{ setPartida.jugadores[idPlayer].username.username }}</h2>
+        <h2>{{ setPartida.jugadores[idPlayer].username }}</h2>
         <div
           class="PS-container"
           :class="{ shake: hit == 0, damageAnimation: hit == 0 }"
@@ -195,7 +193,7 @@ export default {
       <div class="w-full flex flex-col items-end text-2xl">
         <h2 v-if="hit == 1"></h2>
         <h2>
-          {{ setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.username }}
+          {{ setPartida.jugadores[idPlayer == 1 ? 0 : 1].username }}
         </h2>
         <div
           class="PS-container"
@@ -217,9 +215,9 @@ export default {
         <div class="avatar-container no-bottom-lg" id="avatar-one">
           <img
             :src="
-              setPartida.jugadores[idPlayer].username.avatar == 0
+              setPartida.jugadores[idPlayer].avatar == 0
                 ? Calculin.src
-                : setPartida.jugadores[idPlayer].username.avatar == 1
+                : setPartida.jugadores[idPlayer].avatar == 1
                 ? Geometrado.src
                 : Fraccionado.src
             "
@@ -232,9 +230,9 @@ export default {
         <div class="avatar-container no-bottom-lg" id="avatar-two">
           <img
             :src="
-              setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.avatar == 0
+              setPartida.jugadores[idPlayer == 1 ? 0 : 1].avatar == 0
                 ? Calculin.src
-                : setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.avatar == 1
+                : setPartida.jugadores[idPlayer == 1 ? 0 : 1].avatar == 1
                 ? Geometrado.src
                 : Fraccionado.src
             "
@@ -244,58 +242,58 @@ export default {
         </div>
       </div>
     </div>
-      <div class="flex flex-col justify-center items-center text-center m-auto">
-        <div
-          class=" bg-slate-100 rounded-lg flex justify-center transition-colors items-center w-2/6"
-          :class="
-            dificultad === 0
-              ? 'border-4 border-green-500'
-              : dificultad === 1
-              ? 'border-4 border-blue-500'
-              : 'border-4 border-red-500'
-          "
+    <div class="flex flex-col justify-center items-center text-center m-auto">
+      <div
+        class="bg-slate-100 rounded-lg flex justify-center transition-colors items-center w-2/6"
+        :class="
+          dificultad === 0
+            ? 'border-4 border-green-500'
+            : dificultad === 1
+            ? 'border-4 border-blue-500'
+            : 'border-4 border-red-500'
+        "
+      >
+        <span class="text-6xl font-bold p-3"
+          ><b>{{
+            setPartida.jugadores[idPlayer].operacion == ""
+              ? ""
+              : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
+                  "Math.sqrt"
+                )
+              ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
+                  /Math\.sqrt\((\d+)\)/g,
+                  "√$1"
+                )
+              : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
+                  "**"
+                )
+              ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
+                  /\*\*(\d+)/g,
+                  "^$1"
+                )
+              : setPartida.jugadores[idPlayer].operacion[dificultad]
+          }}</b></span
         >
-          <span class="text-6xl font-bold p-3"
-            ><b>{{
-              setPartida.jugadores[idPlayer].operacion == ""
-                ? ""
-                : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
-                    "Math.sqrt"
-                  )
-                ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
-                    /Math\.sqrt\((\d+)\)/g,
-                    "√$1"
-                  )
-                : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
-                    "**"
-                  )
-                ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
-                    /\*\*(\d+)/g,
-                    "^$1"
-                  )
-                : setPartida.jugadores[idPlayer].operacion[dificultad]
-            }}</b></span
-          >
-        </div>
-        <div class="input-operation">
-          <input
-            label="?"
-            variant="outlined"
-            id="result"
-            type="number"
-            class="rounded"
-            :class="{ shake: incorrectResult }"
-            v-model="result"
-          />
-          <button
-            class="btnSolve bg-blue-400 rounded-md p-2"
-            @click="solveOperation()"
-          >
-            Resoldre
-          </button>
-        </div>
       </div>
-    <div class="flex justify-center mt-10  gap-3">
+      <div class="input-operation">
+        <input
+          label="?"
+          variant="outlined"
+          id="result"
+          type="number"
+          class="rounded"
+          :class="{ shake: incorrectResult }"
+          v-model="result"
+        />
+        <button
+          class="btnSolve bg-blue-400 rounded-md p-2"
+          @click="solveOperation()"
+        >
+          Resoldre
+        </button>
+      </div>
+    </div>
+    <div class="flex justify-center mt-10 gap-3">
       <button
         class="dificulty-option bg-[#7ed776] border-4 border-[#7ed776] transition-colors duration-200 items-center flex flex-col justify-center rounded-lg hover:bg-[#71c469] hover:border-green-600"
         :class="dificultad == 0 ? 'focus-border-color' : ''"
