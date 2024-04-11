@@ -1,6 +1,9 @@
 <script setup>
 import { getState, setState, subscribe } from "../store/store.js";
-import { getState as getSocket, subscribe as subSocket } from "../store/socketStore.js";
+import {
+  getState as getSocket,
+  subscribe as subSocket,
+} from "../store/socketStore.js";
 </script>
 <script>
 import { joinClasse } from "../services/communicationManager";
@@ -23,7 +26,11 @@ export default {
         this.codi += inputs[i].value.toString();
       }
       setState({ usuari: { ...getState().usuari, classe: "" } });
-      getSocket().joinSala(this.codi, getState().usuari.nom, getState().usuari.avatar);
+      getSocket().joinSala(
+        this.codi,
+        getState().usuari.nom,
+        getState().usuari.avatar
+      );
     },
     async pasteCode() {
       try {
@@ -56,7 +63,7 @@ export default {
     },
   },
   mounted() {
-    getState().usuari.id == null ? window.location.href = '/' : null;
+    getState().usuari.id == null ? (window.location.href = "/") : null;
     const form = document.querySelector("form");
     const inputs = form.querySelectorAll("input");
     const KEYBOARDS = {
@@ -74,7 +81,7 @@ export default {
         getSocket().joinedSala = null;
       } else if (nuevoValor != null && nuevoValor != false && this.codi != "") {
         await joinClasse(this.setSala.id_classe, getState().usuari.id);
-        window.location.href = '/lobby';
+        window.location.href = "/lobby";
       }
       this.codi = "";
     });
@@ -166,7 +173,7 @@ export default {
         }
       });
     });
-  }
+  },
 };
 </script>
 
@@ -185,21 +192,39 @@ export default {
             <input type="text" maxlength="1" class="input font-bold" />
             <div class="paste-btn-container">
               <button class="paste-btn" @click="() => pasteCode()">
-                <svg fill="black" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  fill="black"
+                  viewBox="0 0 384 512"
+                  height="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
-                    d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z">
-                  </path>
+                    d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"
+                  ></path>
                 </svg>
               </button>
             </div>
           </div>
           <div class="mt-3 text-center">
-            <button class="btn" @click="onSubmit">JUGAR</button>
+            <button
+              class="bg-gradient-to-tr from-[#3431b4] to-[#07bad1] text-white bg-[200%_auto] bg-[center_center] text-[17px] font-medium tracking-[2.5px] transition-[background-position] duration-[0.15s] ease-[ease-in-out] mt-[25px] px-[1.5em] py-[0.6em] rounded-[30px] border-[none] hover:bg-[left_center] hover:animate-[pulse512_1.5s_infinite]"
+              @click="onSubmit"
+            >
+              JUGAR
+            </button>
           </div>
         </form>
 
         <div class="text-center mt-3 font-bold">
-          <a href="/class" class="text-blue-500 hover:underline">Crea una sala</a>
+          <a href="/class" class="text-blue-500 hover:underline"
+            >Crea una sala</a
+          >
+        </div>
+        <div class="text-center mt-5 font-bold relative">
+          <p class="absolute bottom-4 left-56 animate-pulse rotate-12 rounded-full text-xs bg-orange-400 px-2 py-1 z-10">Nou!</p>
+          <a href="/practice" class="bg-gradient-to-tr from-[#b47731] to-[#d11407] text-white bg-[200%_auto] bg-[center_center] text-lg font-medium tracking-wider transition-[background-position] duration-[0.15s] ease-[ease-in-out] mt-[25px] px-4 py-2 rounded-full hover:opacity-90"
+            >Mode pràctica</a
+          >
         </div>
       </div>
     </div>
@@ -255,39 +280,7 @@ input[type="number"] {
   justify-content: center;
 }
 
-.btn {
-  margin-top: 25px;
-  border: none;
-  color: #fff;
-  background: linear-gradient(30deg, #3431b4, #07bad1);
-  border-radius: 30px;
-  background-size: 200% auto;
-  background-position: center center;
-  font-size: 17px;
-  padding: 0.6em 1.5em;
-  font-weight: 500;
-  letter-spacing: 2.5px;
-  transition: background-position 0.15s ease-in-out;
-}
 
-.btn:hover {
-  background-position: left center;
-  animation: pulse512 1.5s infinite;
-}
-
-@keyframes pulse512 {
-  0% {
-    box-shadow: 0 0 0 0 #05bada66;
-  }
-
-  70% {
-    box-shadow: 0 0 0 10px rgb(218 103 68 / 0%);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgb(218 103 68 / 0%);
-  }
-}
 
 .paste-btn {
   width: 28px;

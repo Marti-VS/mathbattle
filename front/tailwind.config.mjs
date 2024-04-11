@@ -8,17 +8,30 @@ export default {
 				moveAndRotate: {
 					'0%': {
 						transform: 'translateX(-20px) rotate(-5deg)'
-					  },
-					
-					  '50%': {
+					},
+
+					'50%': {
 						transform: 'translateX(20px) rotate(5deg)'
-					  },
-					
-					  '100%': {
+					},
+
+					'100%': {
 						transform: 'translateX(-20px) rotate(-5deg)'
-					  }
+					}
+				},
+				pulse512: {
+					'0%': {
+						boxShadow: '0 0 0 0 #05bada66'
+					},
+
+					'70%': {
+						boxShadow: '0 0 0 10px rgb(218 103 68 / 0%)'
+					},
+
+					'100%': {
+						boxShadow: '0 0 0 0 rgb(218 103 68 / 0%)'
+					}
 				}
-			  }
+			}
 		},
 	},
 	plugins: [addDynamicIconSelectors()],

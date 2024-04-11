@@ -45,13 +45,13 @@
                                     <label className="block text-sm font-medium text-gray-700"
                                         htmlFor="name">Nom:</label>
                                     <input type="text" class="border border-slate-300 rounded-md p-1 px-3 w-full mt-1"
-                                        v-model="name"></input>
+                                        v-model="name">
                                 </div>
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700"
                                         htmlFor="name">Correu:</label>
                                     <input type="text" class="border border-slate-300 rounded-md p-1 px-3 w-full mt-1"
-                                        v-model="email"></input>
+                                        v-model="email">
                                 </div>
                                 <label className="block text-sm font-medium text-gray-700" htmlFor="name">Canviar
                                     contrasenya:</label>

@@ -63,7 +63,31 @@ export const useSocketStore = createStore(
       },
       leaveAllSalas: () => {
         socket.emit("leaveAllSala", {});
+      },
+      conectarUsuario: (username, avatar, id_sala, idSocket) => {
+        socket.emit("conectarUsuario", {
+          username: username,
+          avatar: avatar,
+          id_sala: id_sala,
+        }, idSocket);
+      },
+      changeDificulty: (idPartida, idJugador, dificultad) => {
+        socket.emit("changeDificulty", {
+          idPartida: idPartida,
+          idJugador: idJugador,
+          dificultad: dificultad,
+        });
+      },
+      solveOperation: (idPartida, idJugador, idUsuari, idClasse, result) => {
+        socket.emit("solveOperation", {
+          idPartida: idPartida,
+          idJugador: idJugador,
+          idUsuari: idUsuari,
+          idClasse: idClasse,
+          result: result,
+        });
       }
+
     }),
     {
       name: "socketStore",
@@ -72,6 +96,7 @@ export const useSocketStore = createStore(
 );
 
 socket.on("enviaJson", (data) => {
+  console.log(data);
   useSocketStore.setState((state) => ({
     ...state,
     play: false,

@@ -55,11 +55,10 @@ function sockets(io) {
         idSockets[id] = [];
       }
       idSockets[id].push(socket.id);
-      console.log("con: "+ idSockets[id] +" - " + id);
     });
 
-    socket.on("conectarUsuario", (user) => {
-      gestionarPartida(socket, user, io);
+    socket.on("conectarUsuario", (user, idSocket) => {
+      gestionarPartida(user, io, idSocket);
     });
 
     socket.on("changeDificulty", ({ idPartida, idJugador, dificultad }) => {
@@ -93,14 +92,15 @@ function sockets(io) {
     });
 
     socket.on("joinSala", (userInfo, socketId) => {
-      console.log(socketId);
       joinSala(userInfo, socketId);
     });
 
     socket.on("startGame", (startGameInfo) => {
+      console.log(getSocketId(socket.id));
       const sala = salas.find(
         (sala) =>
-          sala.owner == socket.id && sala.id_classe == startGameInfo.idClasse
+          sala.owner == getSocketId(socket.id) &&
+          sala.id_classe == startGameInfo.idClasse
       );
 
       let totalPlayers = sala.jugadores.length;
@@ -134,22 +134,29 @@ function sockets(io) {
     });
 
     socket.on("disconnect", () => {
+      const id = Object.keys(idSockets).find((id) =>
+        idSockets[id].includes(socket.id)
+      );
 
-      const id = Object.keys(idSockets).find(id => idSockets[id].includes(socket.id));
-      
       if (id) {
         idSockets[id].splice(idSockets[id].indexOf(socket.io), 1);
       }
-      
+
       setTimeout(() => {
-        console.log("des: "+ idSockets[id] +" - " + id);
-        if (idSockets[id].length <= 0) {
+        if (idSockets[id]?.length <= 0) {
           console.log("borrat");
           desconectarJugador(id);
         }
       }, 1000);
     });
   });
+
+  function getSocketId(socketId) {
+    const id = Object.keys(idSockets).find((id) =>
+      idSockets[id].includes(socketId)
+    );
+    return id;
+  }
 
   function desconectarTodosJugadores(id) {
     let sala = salas.find((sala) => sala.owner == id);
@@ -165,6 +172,7 @@ function sockets(io) {
   }
 
   function desconectarJugador(socketId) {
+    console.log("desconectat");
     for (let i = 0; i < salas.length; i++) {
       let sala = salas[i];
       const indexJugador = sala.jugadores.findIndex(
@@ -236,11 +244,15 @@ function sockets(io) {
     if (salas.some((sala) => sala.codi == userInfo.codi)) {
       const salaEncontrada = salas.find((sala) => sala.codi == userInfo.codi);
       if (salaEncontrada.owner != null) {
-        salaEncontrada.jugadores.push({
-          id_jugador: id,
-          nombre: userInfo.username,
-          id_avatar: userInfo.idAvatar,
-        });
+        if (
+          !salaEncontrada.jugadores.some((jugador) => jugador.id_jugador == id)
+        ) {
+          salaEncontrada.jugadores.push({
+            id_jugador: id,
+            nombre: userInfo.username,
+            id_avatar: userInfo.idAvatar,
+          });
+        }
 
         io.to(salaEncontrada.owner).emit("join", salaEncontrada);
         for (let i = 0; i < salaEncontrada.jugadores.length; i++) {
@@ -516,8 +528,8 @@ function sockets(io) {
     }
   }
 
-  function gestionarPartida(socket, user, io) {
-    let idPartida = joinPartida(user, socket);
+  function gestionarPartida(user, io, idSocket) {
+    let idPartida = joinPartida(user, idSocket);
 
     let idPartidaIndex = partidas.findIndex(
       (partida) => partida.idPartida == idPartida
@@ -542,11 +554,11 @@ function sockets(io) {
     }
   }
 
-  function joinPartida(user, socket) {
+  function joinPartida(user, idSocket) {
     let partidaId = countPartida;
 
     let jugador = {
-      idSocket: socket.id,
+      idSocket: idSocket,
       username: user.username,
       vida: 100,
       operacion: "",
@@ -584,7 +596,7 @@ function sockets(io) {
       (partida) => partida.idPartida == partidaId
     );
     let idJugador = partidas[partidaIndex].jugadores.findIndex(
-      (jugador) => jugador.idSocket == socket.id
+      (jugador) => jugador.idSocket == idSocket
     );
 
     getOperation(partidaId, idJugador, 1);
