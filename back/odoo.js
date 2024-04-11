@@ -151,26 +151,38 @@ async function findClientIdByEmail(email) {
 
 async function createPurchase(clientId, purchaseNumber) {
     return new Promise((resolve, reject) => {
+        const productDetails = {
+            id: purchaseNumber + 1,
+            name: 'avatar_' + purchaseNumber,
+            list_price: 1,
+            uom_id: [1, 'Units']
+        };
+
+        // Crear una nueva orden de venta con el producto obtenido del array
         odoo.execute_kw(
             'sale.order',
             'create',
             [[{
                 partner_id: clientId,
-                name: `Venta avatar_${purchaseNumber}`,
+                name: `Venta ${productDetails.name}`,
                 state: 'draft',
                 order_line: [
                     [0, 0, {
-                        name: "avatar_" + purchaseNumber,
-                        product_uom_qty: 1
+                        product_id: productDetails.id,
+                        product_uom_qty: 1,
+                        price_unit: productDetails.list_price,
+                        product_uom: productDetails.uom_id[0],
                     }]
                 ]
             }]],
-
             function (err, saleId) {
                 if (err) {
-                    reject(err);
+                    console.error('Error al crear la orden de venta:', err);
+                    // Manejar el error al crear la orden de venta
+                } else {
+                    console.log('Orden de venta creada con ID:', saleId);
+                    // Resolver una promesa, si es necesario, con el ID de la orden de venta creada
                 }
-                resolve(saleId);
             }
         );
     });
