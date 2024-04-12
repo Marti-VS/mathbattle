@@ -12,6 +12,7 @@ const useUserStore = createStore(
         avatar: 0,
         classe: '',
         buyedAvatars: [],
+        punts: 0,
       },
     }),
     {

@@ -2,6 +2,7 @@
 import Classes from "../components/Classes.vue";
 import Configuration from "../components/Configuration.vue";
 import Information from "../components/Information.vue";
+import Shop from "../components/Shop.vue";
 ---
 
 <html lang="en">
@@ -14,7 +15,7 @@ import Information from "../components/Information.vue";
   </head>
   <body class="">
     <Configuration client:visible />
-    <Information client:visible />
+    <Shop client:only="vue" />
     <Classes client:visible />
   </body>
 </html>

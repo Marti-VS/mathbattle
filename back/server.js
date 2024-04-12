@@ -28,7 +28,9 @@ const {
   getDificultats,
   setAvatar,
   buyedAvatars,
-  insertCompraAvatar
+  comprarAvatarSiTieneSuficientesPuntos,
+  getPunts,
+  sumarPunts,
 } = require("./endpointFuncions.js");
 const { createUsers, purchase } = require("./odoo.js");
 const { Server } = require("socket.io");
@@ -259,10 +261,29 @@ app.get("/getDificultats", async (req, res) => {
 });
 
 app.post("/comprarAvatar", async (req, res) => {
-  await insertCompraAvatar(req.body.id, req.body.idUsu)
+  await comprarAvatarSiTieneSuficientesPuntos(req.body.id, req.body.idUsu)
     .then((data) => {
       res.send(data);
-      purchase(req.body.email, req.body.id);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+app.post("/sumarPunts", async (req, res) => {
+  await sumarPunts(req.body.idUsu)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+app.post("/getPunts", async (req, res) => {
+  await getPunts(req.body.idUsu)
+    .then((data) => {
+      res.send(data);
     })
     .catch((err) => {
       res.send(err);

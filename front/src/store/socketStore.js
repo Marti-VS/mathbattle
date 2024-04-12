@@ -5,17 +5,6 @@ import io from "socket.io-client";
 
 const socket = io(import.meta.env.PUBLIC_NODE);
 
-socket.on("connect", () => {
-    if (typeof window !== "undefined") {
-        if (!localStorage.getItem('socketId')) {
-            localStorage.setItem('socketId', socket.id);
-        } else {
-            socket.id = localStorage.getItem('socketId');
-        }
-    }
-    socket.emit("socketId", socket.id);
-});
-
 export const useSocketStore = createStore(
   persist(
     (set) => ({
@@ -39,11 +28,11 @@ export const useSocketStore = createStore(
       play: false,
       sala: null,
       partidas: null,
-      startGame: (idClasse, playProf) => {
+      startGame: (idClasse, playProf, socketId) => {
         socket.emit("startGame", {
           idClasse: idClasse,
           playProf: playProf,
-        });
+        }, socketId);
       },
       getSala: (id, classe) => {
         socket.emit("getSala", localStorage.getItem('socketId'), id, classe);
@@ -78,16 +67,22 @@ export const useSocketStore = createStore(
           dificultad: dificultad,
         });
       },
-      solveOperation: (idPartida, idJugador, idUsuari, idClasse, result) => {
+      solveOperation: (idPartida, idJugador, idUsuari, idClasse, result, socketId) => {
         socket.emit("solveOperation", {
           idPartida: idPartida,
           idJugador: idJugador,
           idUsuari: idUsuari,
           idClasse: idClasse,
           result: result,
+          socketId: socketId,
+        });
+      },
+      changeAvatar: (id_sala, avatar) => {
+        socket.emit("changeAvatar", {
+          id_sala: id_sala,
+          avatar: avatar,
         });
       }
-
     }),
     {
       name: "socketStore",
@@ -95,8 +90,18 @@ export const useSocketStore = createStore(
   )
 );
 
+socket.on("connect", () => {
+  if (typeof window !== "undefined") {
+      if (!localStorage.getItem('socketId')) {
+          localStorage.setItem('socketId', socket.id);
+      } else {
+          socket.id = localStorage.getItem('socketId');
+      }
+  }
+  socket.emit("socketId", socket.id);
+});
+
 socket.on("enviaJson", (data) => {
-  console.log(data);
   useSocketStore.setState((state) => ({
     ...state,
     play: false,
@@ -131,7 +136,6 @@ socket.on("actualizarOperacion", (data) => {
 });
 
 socket.on("join", async (data) => {
-  console.log(data);
   await useSocketStore.setState((state) => ({
     ...state,
     joinedSala: data,
@@ -166,6 +170,11 @@ socket.on("finishGame", () => {
       status: "error",
     },
   }));
+});
+
+socket.on("disconnect" , () => {
+  const { setState } = useSocketStore;
+  setState({ joinedSala: null, partida: null, partidas: null});
 });
 
 export const { getState, setState, subscribe } = useSocketStore;

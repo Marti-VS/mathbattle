@@ -67,14 +67,14 @@ function sockets(io) {
 
     socket.on(
       "solveOperation",
-      ({ idPartida, idJugador, idUsuari, idClasse, result }) => {
+      ({ idPartida, idJugador, idUsuari, idClasse, result, socketId }) => {
         solveOperation(
           idPartida,
           idJugador,
           idUsuari,
           idClasse,
           result,
-          socket.id
+          socketId
         );
       }
     );
@@ -87,8 +87,8 @@ function sockets(io) {
       getSala(socketId, idUser, idClasse);
     });
 
-    socket.on("changeAvatar", (idSocket, avatar) => {
-      changeAvatar(idSocket, socket.id, avatar);
+    socket.on("changeAvatar", (idSala, avatar) => {
+      changeAvatar(idSala, getSocketId(socket.id), avatar);
     });
 
     socket.on("joinSala", (userInfo, socketId) => {
@@ -96,7 +96,6 @@ function sockets(io) {
     });
 
     socket.on("startGame", (startGameInfo) => {
-      console.log(getSocketId(socket.id));
       const sala = salas.find(
         (sala) =>
           sala.owner == getSocketId(socket.id) &&
@@ -126,11 +125,11 @@ function sockets(io) {
     });
 
     socket.on("leaveSala", () => {
-      desconectarJugador(socket.id);
+      desconectarJugador(getSocketId(socket.id));
     });
 
     socket.on("leaveAllSala", () => {
-      desconectarTodosJugadores(socket.id);
+      desconectarTodosJugadores(getSocketId(socket.id));
     });
 
     socket.on("disconnect", () => {
@@ -172,7 +171,6 @@ function sockets(io) {
   }
 
   function desconectarJugador(socketId) {
-    console.log("desconectat");
     for (let i = 0; i < salas.length; i++) {
       let sala = salas[i];
       const indexJugador = sala.jugadores.findIndex(
@@ -221,13 +219,15 @@ function sockets(io) {
   }
 
   function changeAvatar(idSala, idJugador, avatar) {
+    console.log(salas);
+    console.log(idSala);
     if (salas.some((sala) => sala.id_sala == idSala)) {
       const salaEncontrada = salas.find((sala) => sala.id_sala == idSala);
       const jugador = salaEncontrada.jugadores.find(
         (jugador) => jugador.id_jugador == idJugador
       );
       jugador != undefined ? (jugador.id_avatar = avatar) : null;
-
+        console.log(salaEncontrada);
       io.to(salaEncontrada.owner).emit("join", salaEncontrada);
       for (let i = 0; i < salaEncontrada.jugadores.length; i++) {
         io.to(salaEncontrada.jugadores[i].id_jugador).emit(
@@ -235,8 +235,6 @@ function sockets(io) {
           salaEncontrada
         );
       }
-    } else {
-      io.to(id).emit("join", false);
     }
   }
 
@@ -296,7 +294,6 @@ function sockets(io) {
 
       countSala++;
       salas.push(sala);
-      console.log(salas);
       io.to(socketId).emit("join", sala);
     }
   }
@@ -313,7 +310,6 @@ function sockets(io) {
       let previusOwner = sala.owner;
       sala.owner = idSocket;
       setTimeout(() => {
-        console.log(sala.owner);
         io.to(sala.owner).emit("join", sala);
         io.to(previusOwner).emit("join", sala);
       }, 3000);
@@ -343,6 +339,7 @@ function sockets(io) {
   ) {
     let correcto = false;
     const partida = partidas.find((p) => p.idPartida == idPartida);
+
     let realResult = null;
 
     if (partida != undefined) {
@@ -419,11 +416,12 @@ function sockets(io) {
     }
 
     partida.jugadores[idJugador].operacion = operacionEval;
-
-    io.to(partida.jugadores[idJugador].idSocket).emit("actualizarOperacion", {
-      operacion: operacionesGuardar,
-      jugador: idJugador == 1 ? 1 : 0,
-    });
+    
+      io.to(partida.jugadores[idJugador].idSocket).emit("actualizarOperacion", {
+        operacion: operacionesGuardar,
+        jugador: idJugador == 1 ? 1 : 0,
+      });
+    
   }
 
   function saveGameData(idUsu, idClasse, dificultat) {
@@ -487,6 +485,7 @@ function sockets(io) {
 
   // Función para disminuir la vida de un jugador en una partida
   function disminuirVida(idPartida, idJugador) {
+    
     let partida = partidas.find((p) => p.idPartida == idPartida);
 
     switch (partida.jugadores[idJugador].dificultad) {
@@ -506,11 +505,13 @@ function sockets(io) {
         idJugador == 1 ? partida.jugadores[0].vida : partida.jugadores[1].vida;
       const nuevaVida = Math.max(0, vidaActual - cantidad);
       let sala = salas.find((sala) => sala.id_sala == partida.idSala);
-
+      console.log(salas);
+      console.log(partida.idSala);
       partida.jugadores[idJugador == 1 ? 0 : 1].vida = nuevaVida;
       if (sala) {
         sendPartidas(sala.owner, sala.id_sala, io);
         for (let i = 0; i < partida.jugadores.length; i++) {
+          console.log(partida.jugadores[i].idSocket);
           io.to(partida.jugadores[i].idSocket).emit("actualizarVida", {
             vida: nuevaVida,
             jugador: idJugador == 1 ? 0 : 1,
@@ -537,10 +538,12 @@ function sockets(io) {
 
     if (partidas[idPartidaIndex].jugadores.length == 2) {
       for (let i = 0; i < partidas[idPartidaIndex].jugadores.length; i++) {
+        setTimeout(() => {
         io.to(partidas[idPartidaIndex].jugadores[i].idSocket).emit(
           "enviaJson",
           partidas[idPartidaIndex]
         );
+        },300 );
       }
     }
 

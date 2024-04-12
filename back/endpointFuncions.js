@@ -72,7 +72,6 @@ function editClass(nomClasse, idClasse) {
 }
 
 function deleteClass(idClasse) {
-  console.log(idClasse);
   return new Promise((resolve, reject) => {
     const sql = "DELETE FROM CLASSE WHERE idClasse = ?";
     const VALUES = [idClasse];
@@ -287,6 +286,63 @@ function buyedAvatars(idUsu) {
   });
 }
 
+function sumarPunts(idUsu) {
+  return new Promise((resolve, reject) => {
+
+    const sql = "UPDATE USUARIS SET punts = punts + 10 WHERE idUsu = ?";
+    const values = [idUsu];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+function getPunts(idUsu) {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT punts FROM USUARIS WHERE idUsu = ?";
+    const values = [idUsu];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+function comprarAvatarSiTieneSuficientesPuntos(avatarNumber, idUsu) {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT punts FROM USUARIS WHERE idUsu = ?";
+    const values = [idUsu];
+
+    conn.query(sql, values, (err, result) => {
+      if (err) {
+        reject({ error: err });
+      } else {
+        console.log(result[0].punts);
+        if (result[0] && result[0].punts >= 20 && avatarNumber == 1) {
+          insertCompraAvatar(avatarNumber, idUsu)
+            .then(resolve)
+            .catch(reject);
+        } else if (result[0] && result[0].punts >= 50 && avatarNumber == 2) {
+          insertCompraAvatar(avatarNumber, idUsu)
+            .then(resolve)
+            .catch(reject);
+            } else{
+          reject({ error: "No tens prous punts" });
+        }
+      }
+    });
+  });
+}
+
 function insertCompraAvatar(avatarNumber, idUsu) {
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO COMPRASAVATARES (user_id, avatar_number) VALUES (?, ?)";
@@ -320,5 +376,8 @@ module.exports = {
   getDificultats,
   setAvatar,
   buyedAvatars,
-  insertCompraAvatar
+  insertCompraAvatar,
+  comprarAvatarSiTieneSuficientesPuntos,
+  getPunts,
+  sumarPunts,
 };

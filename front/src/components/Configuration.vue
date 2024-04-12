@@ -93,6 +93,7 @@
 
 <script setup>
 import { getState, setState } from "../store/store.js";
+import { setState as socketSetState } from "../store/socketStore.js";
 </script>
 
 <script>
@@ -156,6 +157,7 @@ export default {
                     avatar: null,
                 }
             });
+            socketSetState(null);
         },
         checkPassword() {
             /*  console.log("Dentro")

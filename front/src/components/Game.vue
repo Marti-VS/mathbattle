@@ -1,17 +1,17 @@
 <script setup>
 import {
   getState as getSocket,
+  setState as setSocket,
   subscribe as subSocket,
 } from "../store/socketStore.js";
 import { getState } from "../store/store.js";
 import Calculin from "../assets/pink.png";
 import Fraccionado from "../assets/blue.png";
 import Geometrado from "../assets/white.png";
+import { sumarPunts } from "../services/communicationManager";
 </script>
 
 <script>
-import party from "party-js";
-
 export default {
   data() {
     return {
@@ -19,9 +19,7 @@ export default {
       idPlayer: null,
       hit: null,
       dificultad: 1,
-      mouthPlayer1: "teethSmile",
-      mouthPlayer2: "teethSmile",
-      //vidaRestada: null,
+      partida: null,
       vidaRestada1: "",
       vidaRestada2: "",
       usuaris: {
@@ -33,81 +31,15 @@ export default {
       canPlayModal: false,
     };
   },
-  mounted() {
-    getState().usuari.id == null ? window.location.href = "/inici" : null;
-    this.conectar();
+  async mounted() {
+    getState().usuari.id == null ? (window.location.href = "/inici") : null;
+    await this.conectar();
 
-    this.setPartida;
-    const self = this;
-    document
-      .getElementById("result")
-      .addEventListener("keypress", function (e) {
-        if (e.key == "Enter") {
-          self.solveOperation();
-        }
-      });
-  },
-  methods: {
-    conectar() {
-      getSocket().conectarUsuario({
-        username: getState().usuari.nom,
-        avatar: getState().usuari.avatar,
-        id_sala: getState().sala,
-        idSocket: localStorage.getItem("socketId"),
-      });
-    },
-    changeDificulty(dificultad) {
-      this.dificultad = dificultad;
-      getSocket().changeDificulty({
-        idPartida: getSocket().partida.idPartida,
-        idJugador: this.idPlayer,
-        dificultad: dificultad,
-      });
-    },
-    solveOperation() {
-      if (getSocket().joinedSala) {
-        getSocket().solveOperation({
-          idPartida: getSocket().partida.idPartida,
-          idJugador: this.idPlayer,
-          idUsuari: getState().usuari.id,
-          idClasse: getSocket().joinedSala.id_classe,
-          result: this.result,
-        });
-        if (
-          this.result !=
-          eval(
-            getSocket().partida.jugadores[this.idPlayer].operacion[
-              this.dificultad
-            ]
-          )
-        ) {
-          this.incorrectResult = true;
-        }
-        setTimeout(() => {
-          this.incorrectResult = false;
-        }, 500);
-        this.result = "";
-      }
-    },
-  },
-  watch: {
-    statusGame: function (nuevoValor, antiguoValor) {
-      if (nuevoValor == null) {
-        this.canPlayModal = true;
-        setTimeout(() => {
-          this.$router.push("/join");
-        }, 2000);
-      }
-    },
-  },
-  computed: {
-    setPartida() {
+    await subSocket((state) => {
       if (getSocket().partida.status == "error") {
         getSocket().partida.status = "";
-        this.$router.push("/sala");
+        window.location.href = "/lobby";
       }
-
-      console.log(getSocket().partida);      
       this.idPlayer =
         getSocket().partida.jugadores.findIndex(
           (jugador) => jugador.idSocket == localStorage.getItem("socketId")
@@ -124,7 +56,10 @@ export default {
         getSocket().partida.status == "finish"
       ) {
         //setTimeout(() => {
-        this.$router.push("/sala");
+        if (getSocket().partida.jugadores[this.idPlayer].vida != 0) {
+          sumarPunts(getState().usuari.id);
+        }
+        window.location.href = "/lobby";
         //}, 2000);
       }
 
@@ -161,9 +96,76 @@ export default {
           this.hit = null;
         }, 100);
       }
-      console.log(getSocket().partida);
-      return getSocket().partida;
+      this.partida = getSocket().partida;
+    });
+  },
+  updated() {
+    this.$nextTick(() => {
+      const resElement = document.getElementById("res");
+      if (resElement) {
+        resElement.addEventListener("keypress", (e) => {
+          if (e.key == "Enter") {
+            this.solveOperation();
+          }
+        });
+      }
+    });
+  },
+  methods: {
+    conectar() {
+      getSocket().conectarUsuario(
+        getState().usuari.nom,
+        getState().usuari.avatar,
+        getSocket().sala,
+        localStorage.getItem("socketId")
+      );
     },
+    changeDificulty(dificultad) {
+      this.dificultad = dificultad;
+      getSocket().changeDificulty(
+        getSocket().partida.idPartida,
+        this.idPlayer,
+        dificultad
+      );
+    },
+    solveOperation() {
+      getSocket().solveOperation(
+        getSocket().partida.idPartida,
+        this.idPlayer,
+        getState().usuari.id,
+        getSocket().joinedSala != null
+          ? getSocket().joinedSala.id_classe
+          : getState().usuari.classe,
+        this.result,
+        localStorage.getItem("socketId")
+      );
+      if (
+        this.result !=
+        eval(
+          getSocket().partida.jugadores[this.idPlayer].operacion[
+            this.dificultad
+          ]
+        )
+      ) {
+        this.incorrectResult = true;
+      }
+      setTimeout(() => {
+        this.incorrectResult = false;
+      }, 500);
+      this.result = "";
+    },
+  },
+  watch: {
+    statusGame: function (nuevoValor, antiguoValor) {
+      if (nuevoValor == null) {
+        this.canPlayModal = true;
+        setTimeout(() => {
+          window.location.href = "/join";
+        }, 2000);
+      }
+    },
+  },
+  computed: {
     statusGame() {
       return getSocket().joinedSala;
     },
@@ -172,12 +174,10 @@ export default {
 </script>
 
 <template>
-  <div v-if="setPartida">
-    <div
-      class="px-12 py-5 grid grid-cols-2 text-2xl font-bold"
-    >
+  <div v-if="partida">
+    <div class="px-12 py-5 grid grid-cols-2 text-2xl font-bold">
       <div class="w-full">
-        <h2>{{ setPartida.jugadores[idPlayer].username.username }}</h2>
+        <h2>{{ partida.jugadores[idPlayer].username }}</h2>
         <div
           class="PS-container"
           :class="{ shake: hit == 0, damageAnimation: hit == 0 }"
@@ -185,17 +185,17 @@ export default {
           <div
             class="PS"
             v-bind:style="{
-              width: setPartida.jugadores[idPlayer].vida + '%',
+              width: partida.jugadores[idPlayer].vida + '%',
             }"
           >
-            <p>{{ setPartida.jugadores[idPlayer].vida }}</p>
+            <p>{{ partida.jugadores[idPlayer].vida }}</p>
           </div>
         </div>
       </div>
       <div class="w-full flex flex-col items-end text-2xl">
         <h2 v-if="hit == 1"></h2>
         <h2>
-          {{ setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.username }}
+          {{ partida.jugadores[idPlayer == 1 ? 0 : 1].username }}
         </h2>
         <div
           class="PS-container"
@@ -204,10 +204,10 @@ export default {
           <div
             class="PS"
             v-bind:style="{
-              width: setPartida.jugadores[idPlayer == 1 ? 0 : 1].vida + '%',
+              width: partida.jugadores[idPlayer == 1 ? 0 : 1].vida + '%',
             }"
           >
-            <p>{{ setPartida.jugadores[idPlayer == 1 ? 0 : 1].vida }}</p>
+            <p>{{ partida.jugadores[idPlayer == 1 ? 0 : 1].vida }}</p>
           </div>
         </div>
       </div>
@@ -217,9 +217,9 @@ export default {
         <div class="avatar-container no-bottom-lg" id="avatar-one">
           <img
             :src="
-              setPartida.jugadores[idPlayer].username.avatar == 0
+              partida.jugadores[idPlayer].avatar == 0
                 ? Calculin.src
-                : setPartida.jugadores[idPlayer].username.avatar == 1
+                : partida.jugadores[idPlayer].avatar == 1
                 ? Geometrado.src
                 : Fraccionado.src
             "
@@ -232,9 +232,9 @@ export default {
         <div class="avatar-container no-bottom-lg" id="avatar-two">
           <img
             :src="
-              setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.avatar == 0
+              partida.jugadores[idPlayer == 1 ? 0 : 1].avatar == 0
                 ? Calculin.src
-                : setPartida.jugadores[idPlayer == 1 ? 0 : 1].username.avatar == 1
+                : partida.jugadores[idPlayer == 1 ? 0 : 1].avatar == 1
                 ? Geometrado.src
                 : Fraccionado.src
             "
@@ -244,58 +244,56 @@ export default {
         </div>
       </div>
     </div>
-      <div class="flex flex-col justify-center items-center text-center m-auto">
-        <div
-          class=" bg-slate-100 rounded-lg flex justify-center transition-colors items-center w-2/6"
-          :class="
-            dificultad === 0
-              ? 'border-4 border-green-500'
-              : dificultad === 1
-              ? 'border-4 border-blue-500'
-              : 'border-4 border-red-500'
-          "
+    <div class="flex flex-col justify-center items-center text-center m-auto">
+      <div
+        class="bg-slate-100 rounded-lg flex justify-center transition-colors items-center w-2/6"
+        :class="
+          dificultad === 0
+            ? 'border-4 border-green-500'
+            : dificultad === 1
+            ? 'border-4 border-blue-500'
+            : 'border-4 border-red-500'
+        "
+      >
+        <span class="text-6xl font-bold p-3"
+          ><b>{{
+            partida.jugadores[idPlayer].operacion == ""
+              ? ""
+              : partida.jugadores[idPlayer].operacion[dificultad].includes(
+                  "Math.sqrt"
+                )
+              ? partida.jugadores[idPlayer].operacion[dificultad].replace(
+                  /Math\.sqrt\((\d+)\)/g,
+                  "√$1"
+                )
+              : partida.jugadores[idPlayer].operacion[dificultad].includes("**")
+              ? partida.jugadores[idPlayer].operacion[dificultad].replace(
+                  /\*\*(\d+)/g,
+                  "^$1"
+                )
+              : partida.jugadores[idPlayer].operacion[dificultad]
+          }}</b></span
         >
-          <span class="text-6xl font-bold p-3"
-            ><b>{{
-              setPartida.jugadores[idPlayer].operacion == ""
-                ? ""
-                : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
-                    "Math.sqrt"
-                  )
-                ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
-                    /Math\.sqrt\((\d+)\)/g,
-                    "√$1"
-                  )
-                : setPartida.jugadores[idPlayer].operacion[dificultad].includes(
-                    "**"
-                  )
-                ? setPartida.jugadores[idPlayer].operacion[dificultad].replace(
-                    /\*\*(\d+)/g,
-                    "^$1"
-                  )
-                : setPartida.jugadores[idPlayer].operacion[dificultad]
-            }}</b></span
-          >
-        </div>
-        <div class="input-operation">
-          <input
-            label="?"
-            variant="outlined"
-            id="result"
-            type="number"
-            class="rounded"
-            :class="{ shake: incorrectResult }"
-            v-model="result"
-          />
-          <button
-            class="btnSolve bg-blue-400 rounded-md p-2"
-            @click="solveOperation()"
-          >
-            Resoldre
-          </button>
-        </div>
       </div>
-    <div class="flex justify-center mt-10  gap-3">
+      <div class="justify-center flex flex-col">
+        <p class="text-2xl font-extrabold">=</p>
+        <input
+          placeholder="?"
+          id="res"
+          type="number"
+          class="rounded number-input h-20 w-40 text-center text-6xl bg-gray-100 border-4 border-gray-300 focus:border-blue-500 transition-colors duration-200"
+          :class="{ shake: incorrectResult }"
+          v-model="result"
+        />
+        <button
+          class="bg-blue-400 rounded-md p-2 block w-full mt-2 text-white font-bold transition-colors duration-200 hover:bg-blue-500"
+          @click="solveOperation()"
+        >
+          Resoldre
+        </button>
+      </div>
+    </div>
+    <div class="flex justify-center mt-10 gap-3">
       <button
         class="dificulty-option bg-[#7ed776] border-4 border-[#7ed776] transition-colors duration-200 items-center flex flex-col justify-center rounded-lg hover:bg-[#71c469] hover:border-green-600"
         :class="dificultad == 0 ? 'focus-border-color' : ''"
@@ -379,6 +377,16 @@ export default {
 
 .avatar-container {
   display: flex;
+}
+
+.number-input::-webkit-inner-spin-button,
+.number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input {
+  -moz-appearance: textfield;
 }
 
 .focus-border-color {

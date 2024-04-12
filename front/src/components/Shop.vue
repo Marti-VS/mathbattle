@@ -1,11 +1,17 @@
 <script setup>
-import { getState, setState, subscribe } from "../store/store.js";
+import { getState, setState } from "../store/store.js";
+import { getState as getSocket } from "../store/socketStore.js";
 </script>
 <script>
-import Calculin from '../assets/pink.png';
-import Fraccionado from '../assets/blue.png';
-import Geometrado from '../assets/white.png';
-import { setAvatar, buyedAvatars, buyAvatar } from "../services/communicationManager";
+import Calculin from "../assets/pink.png";
+import Fraccionado from "../assets/blue.png";
+import Geometrado from "../assets/white.png";
+import {
+    setAvatar,
+    buyedAvatars,
+    buyAvatar,
+    getPunts,
+} from "../services/communicationManager";
 
 export default {
     data() {
@@ -13,26 +19,29 @@ export default {
             dialog: false,
             avatars: [
                 {
-                    title: 'Calculín',
-                    alt: 'Calculín Avatar',
+                    title: "Calculín",
+                    preu: 0,
+                    alt: "Calculín Avatar",
                     image: Calculin.src,
                     size: 150,
-                    aspectRatio: '150/150'
+                    aspectRatio: "150/150",
                 },
                 {
-                    title: 'Geometrado',
-                    alt: 'Geometrado Avatar',
+                    title: "Geometrado",
+                    preu: 20,
+                    alt: "Geometrado Avatar",
                     image: Geometrado.src,
                     size: 150,
-                    aspectRatio: '150/150'
+                    aspectRatio: "150/150",
                 },
                 {
-                    title: 'Fraccionado',
-                    alt: 'Fraccionado Avatar',
+                    title: "Fraccionado",
+                    preu: 50,
+                    alt: "Fraccionado Avatar",
                     image: Fraccionado.src,
                     size: 150,
-                    aspectRatio: '150/150'
-                }
+                    aspectRatio: "150/150",
+                },
             ],
             loading: false,
             contentLoad: false,
@@ -46,10 +55,16 @@ export default {
                 setState({ usuari: { ...getState().usuari, avatar: idAvatar } });
             }
             this.loading = false;
+            console.log(getState().usuari);
+            getSocket().changeAvatar(getState().usuari.classe, idAvatar);
         },
         async comprarAvatar(idAvatar) {
             this.loading = true;
-            const response = await buyAvatar(idAvatar, getState().usuari.id, getState().usuari.email);
+            const response = await buyAvatar(
+                idAvatar,
+                getState().usuari.id,
+                getState().usuari.email
+            );
             if (response.rows != 0) {
                 await this.getBuyedAvatars();
             }
@@ -60,7 +75,7 @@ export default {
             const maxAvatarNumber = this.avatars.length;
             let booleanArray = Array(maxAvatarNumber).fill(false);
 
-            arrayObjetos.forEach(objeto => {
+            arrayObjetos.forEach((objeto) => {
                 const avatarNumber = objeto.avatar_number;
                 if (avatarNumber >= 0 && avatarNumber <= maxAvatarNumber) {
                     booleanArray[avatarNumber] = true;
@@ -68,53 +83,74 @@ export default {
             });
 
             booleanArray[0] = true;
-
-            setState({ usuari: { ...getState().usuari, buyedAvatars: booleanArray } });
+            setState({
+                usuari: { ...getState().usuari, buyedAvatars: booleanArray },
+            });
             this.contentLoad = true;
-            console.log(this.contentLoad);
-            console.log(getState().usuari.buyedAvatars);
-        }
+        },
+        async getUserPunts() {
+            const punts = await getPunts(getState().usuari.id);
+            setState({ usuari: { ...getState().usuari, punts: punts[0].punts } });
+        },
     },
     mounted() {
         this.getBuyedAvatars();
-    }
+        this.getUserPunts();
+    },
 };
 </script>
 
-<template>
-    <div class="div-gear">
-        <div class="absolute top-0 right-0 mt-8 md:mr-[155px] mr-[100px]">
+<template v-if="contentLoad">
+    <div>
+        <div class="absolute top-0 right-0 mt-8 md:mr-[105px] mr-[100px]">
             <div>
                 <button v-on:click="dialog = !dialog"
-                    class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden bg-white"
+                    class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden border-[2px] border-white"
                     variant="text" icon="" size="large">
                     <img :src="avatars[getState().usuari.avatar].image" class="scale-150" />
                 </button>
                 <div v-show="dialog" activator="info-svg">
                     <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
                     <div class="relative bg-white rounded-xl shadow-xl pt-8 pb-6 px-4 z-50 top-10">
-                        <h1 className="text-2xl ml-3 font-bold text-center">Botiga d'Avatars</h1>
+                        <div>
+                            <h1 className="text-2xl ml-3 font-bold text-center">
+                                Botiga d'Avatars
+                            </h1>
+                            <h1 className="text-2xl ml-3 font-bold text-center">
+                                Punts: {{ getState().usuari.punts }}
+                            </h1>
+                        </div>
                         <div class="grid grid-cols-3 gap-6 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-6">
                             <!-- Render cards in a grid of 3 columns -->
                             <div v-for="(avatar, index) in avatars" :key="index">
                                 <div class="p-4">
-                                    <h2 class="text-base font-bold text-center">{{ avatar.title }}</h2>
+                                    <h2 class="text-base font-bold text-center">
+                                        {{ avatar.title }}
+                                    </h2>
                                 </div>
                                 <div class="flex items-center justify-center p-4">
-                                    <img :alt="avatar.alt" :height="avatar.size" :src="avatar.image"
-                                        :style="{ aspectRatio: avatar.aspectRatio, objectFit: 'cover' }"
-                                        :width="avatar.size" />
+                                    <img :alt="avatar.alt" :height="avatar.size" :src="avatar.image" :style="{
+                    aspectRatio: avatar.aspectRatio,
+                    objectFit: 'cover',
+                }" :width="avatar.size" />
                                 </div>
+                                <div class="flex justify-center items-center gap-1">
+                                    <h1 class="text-center">{{ avatar.preu }}</h1>
+                                    <i class="icon-[mdi--currency-usd-circle] bg-yellow-500"></i>
+                                </div>
+
                                 <div class="flex items-center justify-center p-4">
-                                    <button
-                                        v-if="getState().usuari.avatar != index && loading == false && getState().usuari.buyedAvatars[index] == true"
-                                        v-on:click="equiparAvatar(index)"
+                                    <button v-if="getState().usuari.avatar != index &&
+                    loading == false &&
+                    getState().usuari.buyedAvatars[index] == true
+                    " v-on:click="equiparAvatar(index)"
                                         class="w-full bg-transparent border border-gray-300 text-gray-700 rounded-md py-2 px-4 flex justify-center items-center cursor-pointer">
                                         Equipar
                                     </button>
-                                    <button
-                                        v-if="getState().usuari.avatar != index && loading == false && getState().usuari.buyedAvatars[index] == false"
-                                        v-on:click="comprarAvatar(index)"
+                                    <button v-if="getState().usuari.avatar != index &&
+                    loading == false &&
+                    getState().usuari.buyedAvatars[index] == false
+                    " v-on:click="comprarAvatar(index)"
                                         class="w-full bg-transparent border border-gray-300 text-gray-700 rounded-md py-2 px-4 flex justify-center items-center cursor-pointer">
                                         <span class="icon-[tdesign--shop] w-4 h-4 mr-2"></span>
                                         Comprar
