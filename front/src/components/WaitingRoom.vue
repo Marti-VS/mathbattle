@@ -152,7 +152,7 @@ export default {
       ) {
         window.location.href = "/game";
       }
-
+      
       this.partidas();
     });
   },
