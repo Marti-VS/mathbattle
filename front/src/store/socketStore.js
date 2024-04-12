@@ -76,8 +76,13 @@ export const useSocketStore = createStore(
           result: result,
           socketId: socketId,
         });
+      },
+      changeAvatar: (id_sala, avatar) => {
+        socket.emit("changeAvatar", {
+          id_sala: id_sala,
+          avatar: avatar,
+        });
       }
-
     }),
     {
       name: "socketStore",

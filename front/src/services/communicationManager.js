@@ -221,3 +221,33 @@ export function buyAvatar(idAvatar, idUsu, email) {
   });
 }
 
+export function sumarPunts(idUsu) {
+  return new Promise((resolve, reject) => {
+    fetch(NODE + `/sumarPunts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idUsu: idUsu,
+      }),
+    }).then((response) => response.json())
+      .then((data) => { resolve(data) });
+  });
+}
+
+export function getPunts(idUsu) {
+  return new Promise((resolve, reject) => {
+    fetch(NODE + `/getPunts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idUsu: idUsu,
+      }),
+    }).then((response) => response.json())
+      .then((data) => { resolve(data) });
+  });
+}
+

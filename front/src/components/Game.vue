@@ -8,6 +8,7 @@ import { getState } from "../store/store.js";
 import Calculin from "../assets/pink.png";
 import Fraccionado from "../assets/blue.png";
 import Geometrado from "../assets/white.png";
+import { sumarPunts } from "../services/communicationManager";
 </script>
 
 <script>
@@ -55,6 +56,9 @@ export default {
         getSocket().partida.status == "finish"
       ) {
         //setTimeout(() => {
+        if (getSocket().partida.jugadores[this.idPlayer].vida != 0) {
+          sumarPunts(getState().usuari.id);
+        }
         window.location.href = "/lobby";
         //}, 2000);
       }
@@ -95,6 +99,18 @@ export default {
       this.partida = getSocket().partida;
     });
   },
+  updated() {
+    this.$nextTick(() => {
+      const resElement = document.getElementById("res");
+      if (resElement) {
+        resElement.addEventListener("keypress", (e) => {
+          if (e.key == "Enter") {
+            this.solveOperation();
+          }
+        });
+      }
+    });
+  },
   methods: {
     conectar() {
       getSocket().conectarUsuario(
@@ -113,31 +129,30 @@ export default {
       );
     },
     solveOperation() {
-        getSocket().solveOperation(
-          getSocket().partida.idPartida,
-          this.idPlayer,
-          getState().usuari.id,
-          getSocket().joinedSala != null
-            ? getSocket().joinedSala.id_classe
-            : getState().usuari.classe,
-          this.result,
-          localStorage.getItem("socketId")
-        );
-        if (
-          this.result !=
-          eval(
-            getSocket().partida.jugadores[this.idPlayer].operacion[
-              this.dificultad
-            ]
-          )
-        ) {
-          this.incorrectResult = true;
-        }
-        setTimeout(() => {
-          this.incorrectResult = false;
-        }, 500);
-        this.result = "";
-      
+      getSocket().solveOperation(
+        getSocket().partida.idPartida,
+        this.idPlayer,
+        getState().usuari.id,
+        getSocket().joinedSala != null
+          ? getSocket().joinedSala.id_classe
+          : getState().usuari.classe,
+        this.result,
+        localStorage.getItem("socketId")
+      );
+      if (
+        this.result !=
+        eval(
+          getSocket().partida.jugadores[this.idPlayer].operacion[
+            this.dificultad
+          ]
+        )
+      ) {
+        this.incorrectResult = true;
+      }
+      setTimeout(() => {
+        this.incorrectResult = false;
+      }, 500);
+      this.result = "";
     },
   },
   watch: {
@@ -260,18 +275,18 @@ export default {
           }}</b></span
         >
       </div>
-      <div class="input-operation">
+      <div class="justify-center flex flex-col">
+        <p class="text-2xl font-extrabold">=</p>
         <input
-          label="?"
-          variant="outlined"
+          placeholder="?"
           id="res"
           type="number"
-          class="rounded"
+          class="rounded number-input h-20 w-40 text-center text-6xl bg-gray-100 border-4 border-gray-300 focus:border-blue-500 transition-colors duration-200"
           :class="{ shake: incorrectResult }"
           v-model="result"
         />
         <button
-          class="btnSolve bg-blue-400 rounded-md p-2"
+          class="bg-blue-400 rounded-md p-2 block w-full mt-2 text-white font-bold transition-colors duration-200 hover:bg-blue-500"
           @click="solveOperation()"
         >
           Resoldre
@@ -362,6 +377,16 @@ export default {
 
 .avatar-container {
   display: flex;
+}
+
+.number-input::-webkit-inner-spin-button,
+.number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input {
+  -moz-appearance: textfield;
 }
 
 .focus-border-color {
