@@ -2,9 +2,9 @@
 import { getState, setState, subscribe } from "../store/store.js";
 </script>
 <script>
-import Calculin from '../assets/pink.png'
-import Fraccionado from '../assets/blue.png'
-import Geometrado from '../assets/white.png'
+import Calculin from '../assets/pink.png';
+import Fraccionado from '../assets/blue.png';
+import Geometrado from '../assets/white.png';
 import { setAvatar, buyedAvatars, buyAvatar } from "../services/communicationManager";
 
 export default {

@@ -19,8 +19,9 @@
                         </div>
                         <div className="flex flex-col items-center w-full">
                             <div class="flex items-center justify-center mx-3 ">
-                                <img :src="getAvatarUrl(avatar)" alt="Avatar"
-                                    class="size-20 rounded-full bg-red-100 border-slate-300 border">
+                                <div class="size-20 rounded-full overflow-hidden">
+                                    <img :src="avatars[getState().usuari.avatar].image" class="scale-150" />
+                                </div>
                             </div>
                             <div className="mt-2 text-center">
                                 <p className="text-lg font-semibold">{{ name }} {{ surname }}</p>
@@ -95,6 +96,9 @@ import { getState, setState } from "../store/store.js";
 </script>
 
 <script>
+import Calculin from '../assets/pink.png';
+import Fraccionado from '../assets/blue.png';
+import Geometrado from '../assets/white.png';
 
 export default {
     data() {
@@ -111,6 +115,29 @@ export default {
             show1: false,
             show2: false,
             editMenu: false,
+            avatars: [
+                {
+                    title: 'Calculín',
+                    alt: 'Calculín Avatar',
+                    image: Calculin.src,
+                    size: 150,
+                    aspectRatio: '150/150'
+                },
+                {
+                    title: 'Geometrado',
+                    alt: 'Geometrado Avatar',
+                    image: Geometrado.src,
+                    size: 150,
+                    aspectRatio: '150/150'
+                },
+                {
+                    title: 'Fraccionado',
+                    alt: 'Fraccionado Avatar',
+                    image: Fraccionado.src,
+                    size: 150,
+                    aspectRatio: '150/150'
+                }
+            ],
             // rules: {
             //     required: value => !!value || 'Required.',
             //     min: v => v.length >= 8 || 'Min 8 characters',
