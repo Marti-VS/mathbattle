@@ -1,7 +1,7 @@
 //IMPORTAR MODULOS
 const express = require("express");
 const app = express();
-const port = 3751;
+const port = process.env.PORT || 3751;
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
