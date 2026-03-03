@@ -55,7 +55,6 @@ export default {
                 setState({ usuari: { ...getState().usuari, avatar: idAvatar } });
             }
             this.loading = false;
-            console.log(getState().usuari);
             getSocket().changeAvatar(getState().usuari.classe, idAvatar);
         },
         async comprarAvatar(idAvatar) {
@@ -72,6 +71,7 @@ export default {
         },
         async getBuyedAvatars() {
             let arrayObjetos = await buyedAvatars(getState().usuari.id);
+            if (!Array.isArray(arrayObjetos)) arrayObjetos = [];
             const maxAvatarNumber = this.avatars.length;
             let booleanArray = Array(maxAvatarNumber).fill(false);
 
@@ -90,7 +90,7 @@ export default {
         },
         async getUserPunts() {
             const punts = await getPunts(getState().usuari.id);
-            setState({ usuari: { ...getState().usuari, punts: punts[0].punts } });
+            setState({ usuari: { ...getState().usuari, punts: punts[0].puntos } });
         },
     },
     mounted() {
@@ -102,33 +102,33 @@ export default {
 
 <template v-if="contentLoad">
     <div>
-        <div class="absolute top-0 right-0 mt-8 md:mr-[105px] mr-[100px]">
+        <div class="top-0 right-0 absolute mt-8 mr-[100px] md:mr-[105px]">
             <div>
                 <button v-on:click="dialog = !dialog"
-                    class="text-white hover:text-slate-200 transition-all float-right size-8 rounded-full overflow-hidden border-[2px] border-white"
+                    class="float-right border-[2px] border-white rounded-full size-8 overflow-hidden text-white hover:text-slate-200 transition-all"
                     variant="text" icon="" size="large">
-                    <img :src="avatars[getState().usuari.avatar].image" class="scale-150" />
+                    <img :src="avatars[getState().usuari.avatar ?? 0]?.image" class="scale-150" />
                 </button>
                 <div v-show="dialog" activator="info-svg">
-                    <div class="fixed inset-0 bg-gray-900 opacity-25 z-10" v-on:click="dialog = !dialog"></div>
-                    <div class="relative bg-white rounded-xl shadow-xl pt-8 pb-6 px-4 z-50 top-10">
+                    <div class="z-10 fixed inset-0 bg-gray-900 opacity-25" v-on:click="dialog = !dialog"></div>
+                    <div class="top-10 z-50 relative bg-white shadow-xl px-4 pt-8 pb-6 rounded-xl">
                         <div>
-                            <h1 className="text-2xl ml-3 font-bold text-center">
+                            <h1 className="ml-3 font-bold text-2xl text-center">
                                 Botiga d'Avatars
                             </h1>
-                            <h1 className="text-2xl ml-3 font-bold text-center">
+                            <h1 className="ml-3 font-bold text-2xl text-center">
                                 Punts: {{ getState().usuari.punts }}
                             </h1>
                         </div>
-                        <div class="grid grid-cols-3 gap-6 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-6">
+                        <div class="gap-6 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-6 grid grid-cols-3">
                             <!-- Render cards in a grid of 3 columns -->
                             <div v-for="(avatar, index) in avatars" :key="index">
                                 <div class="p-4">
-                                    <h2 class="text-base font-bold text-center">
+                                    <h2 class="font-bold text-base text-center">
                                         {{ avatar.title }}
                                     </h2>
                                 </div>
-                                <div class="flex items-center justify-center p-4">
+                                <div class="flex justify-center items-center p-4">
                                     <img :alt="avatar.alt" :height="avatar.size" :src="avatar.image" :style="{
                     aspectRatio: avatar.aspectRatio,
                     objectFit: 'cover',
@@ -136,32 +136,32 @@ export default {
                                 </div>
                                 <div class="flex justify-center items-center gap-1">
                                     <h1 class="text-center">{{ avatar.preu }}</h1>
-                                    <i class="icon-[mdi--currency-usd-circle] bg-yellow-500"></i>
+                                    <i class="bg-yellow-500 icon-[mdi--currency-usd-circle]"></i>
                                 </div>
 
-                                <div class="flex items-center justify-center p-4">
+                                <div class="flex justify-center items-center p-4">
                                     <button v-if="getState().usuari.avatar != index &&
                     loading == false &&
-                    getState().usuari.buyedAvatars[index] == true
+                    getState().usuari.buyedAvatars?.[index] == true
                     " v-on:click="equiparAvatar(index)"
-                                        class="w-full bg-transparent border border-gray-300 text-gray-700 rounded-md py-2 px-4 flex justify-center items-center cursor-pointer">
+                                        class="flex justify-center items-center bg-transparent px-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 cursor-pointer">
                                         Equipar
                                     </button>
                                     <button v-if="getState().usuari.avatar != index &&
                     loading == false &&
-                    getState().usuari.buyedAvatars[index] == false
+                    getState().usuari.buyedAvatars?.[index] == false
                     " v-on:click="comprarAvatar(index)"
-                                        class="w-full bg-transparent border border-gray-300 text-gray-700 rounded-md py-2 px-4 flex justify-center items-center cursor-pointer">
-                                        <span class="icon-[tdesign--shop] w-4 h-4 mr-2"></span>
+                                        class="flex justify-center items-center bg-transparent px-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 cursor-pointer">
+                                        <span class="mr-2 w-4 h-4 icon-[tdesign--shop]"></span>
                                         Comprar
                                     </button>
                                     <button v-if="getState().usuari.avatar == index && loading == false"
-                                        class="w-full border border-gray-300 text-white rounded-md py-2 px-4 flex justify-center items-center bg-blue-400">
+                                        class="flex justify-center items-center bg-blue-400 px-4 py-2 border border-gray-300 rounded-md w-full text-white">
                                         Equipat
                                     </button>
                                     <button v-if="loading"
-                                        class="w-full bg-transparent border border-gray-300 text-blue-500 rounded-md py-2 px-4 flex justify-center items-center">
-                                        <span class="icon-[line-md--loading-twotone-loop] h-6"></span>
+                                        class="flex justify-center items-center bg-transparent px-4 py-2 border border-gray-300 rounded-md w-full text-blue-500">
+                                        <span class="h-6 icon-[line-md--loading-twotone-loop]"></span>
                                     </button>
                                 </div>
                             </div>

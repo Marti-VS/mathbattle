@@ -1,41 +1,41 @@
 <template>
-  <div class="h-screen flex flex-col gap-3 items-center justify-center">
-    <div class="flex justify-center bg-white rounded-2xl shadow-lg h-96">
+  <div class="flex flex-col justify-center items-center gap-3 h-screen">
+    <div class="flex justify-center bg-white shadow-lg rounded-2xl h-96">
       <div :class="(!registred
         ? 'rounded-l-2xl w-[20vw] flex items-center justify-center px-16 bg-[url(/src/assets/Background.png)] '
         : '') +
         'rounded-l-2xl w-[20vw] flex items-center justify-center px-16'
         ">
         <div :class="registred ? 'hidden duration-700 ease-in-out' : ''">
-          <h1 class="font-bold text-4xl mb-5 text-center">Ja tens compte?</h1>
+          <h1 class="mb-5 font-bold text-4xl text-center">Ja tens compte?</h1>
           <button :onclick="() => {
         registred = !registred;
         formErrors = '';
       }
-        " class="p-2 bg-blue-600 rounded font-bold w-full text-white">
+        " class="bg-blue-600 p-2 rounded w-full font-bold text-white">
             Inicia sessió
           </button>
         </div>
         <div :class="!registred ? 'hidden duration-700 ease-in-out' : ''">
-          <h2 class="my-2 mb-5 text-4xl text-center w-full font-bold">
+          <h2 class="my-2 mb-5 w-full font-bold text-4xl text-center">
             Inicia sessió
           </h2>
-          <form @submit.prevent="checkForm('login')" class="grid gap-2">
+          <form @submit.prevent="checkForm('login')" class="gap-2 grid">
             <label>
-              <p class="pl-2 opacity-80">Email</p>
+              <p class="opacity-80 pl-2">Email</p>
 
               <input v-model="loginData.email" placeholder="Email" type="email" autocomplete="username"
-                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                class="block shadow-sm px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-md focus:outline-none focus:ring-indigo-500 w-full placeholder-gray-400" />
             </label>
             <label>
-              <p class="pl-2 opacity-80">Contrasenya</p>
+              <p class="opacity-80 pl-2">Contrasenya</p>
               <input v-model="loginData.password" type="password" autocomplete="current-password"
                 placeholder="Contrassenya"
-                class="w-full block px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                class="block shadow-sm px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-md focus:outline-none focus:ring-indigo-500 w-full placeholder-gray-400" />
             </label>
 
             <button type="submit"
-              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors">
+              class="bg-sky-400 hover:bg-sky-600 mt-3 px-4 py-2 rounded font-bold text-white transition-colors">
               Inicia sessió
             </button>
           </form>
@@ -45,41 +45,41 @@
         ' rounded-r-2xl w-[20vw] flex items-center justify-center px-16'
         ">
         <div :class="!registred ? 'hidden duration-700 ease-in-out' : ''">
-          <h1 class="text-center text-4xl font-bold mb-7">
+          <h1 class="mb-7 font-bold text-4xl text-center">
             Encara no tens compte?
           </h1>
           <button :onclick="() => {
         registred = !registred;
         formErrors = '';
       }
-        " class="p-2 bg-blue-600 rounded font-bold w-full text-white">
+        " class="bg-blue-600 p-2 rounded w-full font-bold text-white">
             Crea't un!
           </button>
         </div>
         <div :class="registred ? 'hidden duration-700 ease-in-out' : ''">
-          <h2 class="my-2 mb-10 text-4xl text-center font-bold">Registra't</h2>
-          <form @submit.prevent="checkForm('register')" class="grid gap-2">
-            <div class="grid grid-cols-2 gap-2">
+          <h2 class="my-2 mb-10 font-bold text-4xl text-center">Registra't</h2>
+          <form @submit.prevent="checkForm('register')" class="gap-2 grid">
+            <div class="gap-2 grid grid-cols-2">
               <label>
-                <p class="pl-2 opacity-80">Nom d'usuari</p>
+                <p class="opacity-80 pl-2">Nom d'usuari</p>
                 <input v-model="registerData.name" placeholder="Nom d'usuari" type="name"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                  class="block shadow-sm px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-md focus:outline-none focus:ring-indigo-500 w-full placeholder-gray-400" />
               </label>
               <label>
-                <p class="pl-2 opacity-80">Email</p>
+                <p class="opacity-80 pl-2">Email</p>
                 <input v-model="registerData.email" placeholder="Email" type="email" autocomplete="username"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                  class="block shadow-sm px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-md focus:outline-none focus:ring-indigo-500 w-full placeholder-gray-400" />
               </label>
             </div>
 
             <label>
-              <p class="pl-2 opacity-80">Contrasenya</p>
+              <p class="opacity-80 pl-2">Contrasenya</p>
               <input v-model="registerData.password" placeholder="Contrassenya" type="password"
                 autocomplete="current-password"
-                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                class="block shadow-sm px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-md focus:outline-none focus:ring-indigo-500 w-full placeholder-gray-400" />
             </label>
             <button id="btnSubmit" type="submit"
-              class="bg-sky-400 hover:bg-sky-600 text-white font-bold mt-3 py-2 px-4 rounded transition-colors">
+              class="bg-sky-400 hover:bg-sky-600 mt-3 px-4 py-2 rounded font-bold text-white transition-colors">
               Registra't
             </button>
           </form>
@@ -87,17 +87,13 @@
       </div>
     </div>
     <div
-      class="flex items-center p-4 max-w-[40vw] text-pretty mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-100"
+      class="flex items-center bg-red-100 mb-4 p-4 border border-red-300 rounded-lg max-w-[40vw] text-red-800 text-sm text-pretty"
       role="alert" :class="formErrors != '' ? 'visible' : 'invisible'">
-      <span class="icon-[material-symbols--info] size-8 mr-3"></span>
+      <span class="mr-3 size-8 icon-[material-symbols--info]"></span>
       <div><span class="font-medium">Error!</span> {{ formErrors }}</div>
     </div>
   </div>
 </template>
-
-<script setup>
-import bgImage from "../assets/Background.png";
-</script>
 
 <script>
 import { register, login } from "../services/communicationManager";
@@ -148,6 +144,9 @@ export default {
     async register() {
       let data = await register(this.registerData);
 
+      console.log(data);
+      
+
       if (data.err) {
         this.formErrors = "El correu ja ha estat registrat abans.";
       } else {
@@ -170,10 +169,10 @@ export default {
       } else {
         setState({
           usuari: {
-            nom: data.userData.nom,
-            cognom: data.userData.cognom,
-            email: data.userData.correu,
-            id: data.userData.idUsu,
+            nom: data.userData.nombre,
+            cognom: data.userData.apellido,
+            email: data.userData.correo,
+            id: data.userData.idUsuario,
             avatar: data.userData.avatar
           },
         });

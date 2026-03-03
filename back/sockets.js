@@ -1,16 +1,16 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+// const { MongoClient, ServerApiVersion } = require("mongodb");
 
-//PARTE DE LA BASE DE DATOS MongoDB
-const client = new MongoClient(
-  "mongodb+srv://a21marsalval_bd:ToniNoRobes2021@tr2.eatpoha.mongodb.net/?retryWrites=true&w=majority",
-  {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    },
-  }
-);
+// //PARTE DE LA BASE DE DATOS MongoDB
+// const client = new MongoClient(
+//   "mongodb+srv://a21marsalval_bd:ToniNoRobes2021@tr2.eatpoha.mongodb.net/?retryWrites=true&w=majority",
+//   {
+//     serverApi: {
+//       version: ServerApiVersion.v1,
+//       strict: true,
+//       deprecationErrors: true,
+//     },
+//   }
+// );
 
 let salas = [];
 let partidas = [];
@@ -425,24 +425,24 @@ function sockets(io) {
   }
 
   function saveGameData(idUsu, idClasse, dificultat) {
-    return new Promise(async (resolve, reject) => {
-      await client.connect();
-      let dbo = client.db("mathbattle");
-      dificultat == 0 ? (dificultat = "fàcil") : null;
-      dificultat == 1 ? (dificultat = "mitjà") : null;
-      dificultat == 2 ? (dificultat = "difícil") : null;
-      let myobj = {
-        id_usuari: idUsu,
-        id_classe: idClasse,
-        difficulty: dificultat,
-      };
-
-      dbo.collection("correctAnswers").insertOne(myobj, function (err, res) {
-        if (err) throw reject({ err: err });
-        db.close();
-      });
-      resolve({ userData: "ok" });
-    });
+    // MongoDB desactivado
+    // return new Promise(async (resolve, reject) => {
+    //   await client.connect();
+    //   let dbo = client.db("mathbattle");
+    //   dificultat == 0 ? (dificultat = "fàcil") : null;
+    //   dificultat == 1 ? (dificultat = "mitjà") : null;
+    //   dificultat == 2 ? (dificultat = "difícil") : null;
+    //   let myobj = {
+    //     id_usuari: idUsu,
+    //     id_classe: idClasse,
+    //     difficulty: dificultat,
+    //   };
+    //   dbo.collection("correctAnswers").insertOne(myobj, function (err, res) {
+    //     if (err) throw reject({ err: err });
+    //     db.close();
+    //   });
+    //   resolve({ userData: "ok" });
+    // });
   }
 
   function generarOperatorRandom() {
@@ -505,13 +505,11 @@ function sockets(io) {
         idJugador == 1 ? partida.jugadores[0].vida : partida.jugadores[1].vida;
       const nuevaVida = Math.max(0, vidaActual - cantidad);
       let sala = salas.find((sala) => sala.id_sala == partida.idSala);
-      console.log(salas);
-      console.log(partida.idSala);
+
       partida.jugadores[idJugador == 1 ? 0 : 1].vida = nuevaVida;
       if (sala) {
         sendPartidas(sala.owner, sala.id_sala, io);
         for (let i = 0; i < partida.jugadores.length; i++) {
-          console.log(partida.jugadores[i].idSocket);
           io.to(partida.jugadores[i].idSocket).emit("actualizarVida", {
             vida: nuevaVida,
             jugador: idJugador == 1 ? 0 : 1,

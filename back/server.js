@@ -32,9 +32,9 @@ const {
   getPunts,
   sumarPunts,
 } = require("./endpointFuncions.js");
-const { createUsers, purchase } = require("./odoo.js");
 const { Server } = require("socket.io");
 const { log } = require("console");
+require('dotenv').config();
 
 const io = new Server(server, {
   cors: {
@@ -47,10 +47,11 @@ sockets(io);
 
 //PARTE DE LA BASE DE DATOS MYSQL
 let conn = mysql.createPool({
-  host: "dam.inspedralbes.cat",
-  user: "a22oscmungar_proyecto2",
-  password: "Proyecto2",
-  database: "a22oscmungar_proyecto2",
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
   connectionLimit: 100,
   queueLimit: 5,
   waitForConnections: true,
@@ -73,7 +74,6 @@ app.use(
 
 app.use(bodyParser.json());
 
-createUsers();
 //PARTE DE LAS RUTAS
 
 //ruta para crear classes
@@ -177,7 +177,7 @@ app.get("/usuario/:idUsuari", async (req, res) => {
 
 //ruta para hacer login
 app.post("/login", async (req, res) => {
-  await login(req.body.email, req.body.password)
+  await login(req.body.correo, req.body.contrasena)
     .then((data) => {
       res.send(data);
     })
@@ -188,13 +188,12 @@ app.post("/login", async (req, res) => {
 
 //ruta para registrar un usuario
 app.post("/register", async (req, res) => {
-  await register(req.body.email, req.body.password, req.body.nom)
+  await register(req.body.name, req.body.email, req.body.password)
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.send(err);
-      createUsers();
     });
 });
 

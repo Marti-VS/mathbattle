@@ -8,7 +8,7 @@ export function register(emailRegistration) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nom: emailRegistration.name,
+        name: emailRegistration.name,
         email: emailRegistration.email,
         password: emailRegistration.password,
       }),
@@ -29,8 +29,8 @@ export function login(loginData) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: loginData.email,
-        password: loginData.password,
+        correo: loginData.email,
+        contrasena: loginData.password,
       }),
     })
       .then((response) => response.json())

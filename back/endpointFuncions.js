@@ -1,11 +1,13 @@
+require('dotenv').config();
 const mysql = require("mysql2");
 const CryptoJS = require("crypto-js");
 
 let conn = mysql.createPool({
-  host: "dam.inspedralbes.cat",
-  user: "a22oscmungar_proyecto2",
-  password: "Proyecto2",
-  database: "a22oscmungar_proyecto2",
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
   connectionLimit: 100,
   queueLimit: 5,
   waitForConnections: true,
@@ -13,8 +15,8 @@ let conn = mysql.createPool({
 
 function createClass(nomClasse, idProfe) {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO CLASSE SET ?";
-    const VALUES = { nomClasse: nomClasse, idPropietari: idProfe };
+    const sql = "INSERT INTO CLASE SET ?";
+    const VALUES = { nombreClase: nomClasse, idPropietario: idProfe };
 
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -28,8 +30,8 @@ function createClass(nomClasse, idProfe) {
 
 function addDifficulty(nomDificultat, idProfe) {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO DIFICULTAT SET ?";
-    const VALUES = { nomDificultat: nomDificultat, idProfe: idProfe };
+    const sql = "INSERT INTO DIFICULTAD SET ?";
+    const VALUES = { nomDificultad: nomDificultat, idProfe: idProfe };
 
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -43,8 +45,8 @@ function addDifficulty(nomDificultat, idProfe) {
 
 function addOperation(num1Min, num1Max, operador, num2Min, num2Max, idDificultat, nivell) {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO OPERACIO SET ?";
-    const VALUES = { minNum1: num1Min, maxNum1: num1Max, operador: operador, minNum2: num2Min, maxNum2: num2Max, idDificultat: idDificultat, nivell: nivell };
+    const sql = "INSERT INTO OPERACION SET ?";
+    const VALUES = { minNum1: num1Min, maxNum1: num1Max, operador: operador, minNum2: num2Min, maxNum2: num2Max, idDificultad: idDificultat, nivel: nivell };
 
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -58,7 +60,7 @@ function addOperation(num1Min, num1Max, operador, num2Min, num2Max, idDificultat
 
 function editClass(nomClasse, idClasse) {
   return new Promise((resolve, reject) => {
-    const sql = "UPDATE CLASSE SET nomClasse = ? WHERE idClasse = ?";
+    const sql = "UPDATE CLASE SET nombreClase = ? WHERE idClase = ?";
     const VALUES = [nomClasse, idClasse];
 
     conn.query(sql, VALUES, (err, result) => {
@@ -73,7 +75,7 @@ function editClass(nomClasse, idClasse) {
 
 function deleteClass(idClasse) {
   return new Promise((resolve, reject) => {
-    const sql = "DELETE FROM CLASSE WHERE idClasse = ?";
+    const sql = "DELETE FROM CLASE WHERE idClase = ?";
     const VALUES = [idClasse];
 
     conn.query(sql, VALUES, (err, result) => {
@@ -88,7 +90,7 @@ function deleteClass(idClasse) {
 
 function getClassByUserId(idPropietari) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM `CLASSE` WHERE idPropietari = ?";
+    const sql = "SELECT * FROM `CLASE` WHERE idPropietario = ?";
     const VALUES = [idPropietari];
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -99,8 +101,8 @@ function getClassByUserId(idPropietari) {
           promises.push(
             new Promise((resolve, reject) => {
               const sql2 =
-                "SELECT CLASSE.idClasse, CLASSE.nomClasse, COUNT(PERTANY.idUsu) AS numeroUsuarios FROM CLASSE LEFT JOIN PERTANY ON CLASSE.idClasse = PERTANY.idClasse WHERE CLASSE.idPropietari = ? AND CLASSE.idClasse = ? GROUP BY CLASSE.idClasse, CLASSE.nomClasse;";
-              const VALUES2 = [idPropietari, result[i].idClasse];
+                "SELECT CLASE.idClase, CLASE.nombreClase, COUNT(PERTENECE.idUsuario) AS numeroUsuarios FROM CLASE LEFT JOIN PERTENECE ON CLASE.idClase = PERTENECE.idClase WHERE CLASE.idPropietario = ? AND CLASE.idClase = ? GROUP BY CLASE.idClase, CLASE.nombreClase;";
+              const VALUES2 = [idPropietari, result[i].idClase];
               conn.query(sql2, VALUES2, (err2, result2) => {
                 if (err2) {
                   reject({ err: err2 });
@@ -123,7 +125,7 @@ function getClassByUserId(idPropietari) {
 
 function getUserIdByClassId(idClass) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT idUsu FROM PERTANY WHERE idClasse = ?";
+    const sql = "SELECT idUsuario FROM PERTENECE WHERE idClase = ?";
     const VALUES = [idClass];
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -137,7 +139,7 @@ function getUserIdByClassId(idClass) {
 
 function getClassNameByClassId(idClass) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT nomClasse FROM CLASSE WHERE idClasse = ?";
+    const sql = "SELECT nombreClase FROM CLASE WHERE idClase = ?";
     const VALUES = [idClass];
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -149,10 +151,10 @@ function getClassNameByClassId(idClass) {
   });
 }
 
-function joinClasse(idClass, idUsu) {
+function joinClasse(idClass, idUsuario) {
   return new Promise((resolve, reject) => {
-    const sql = "INSERT INTO `PERTANY` (`idClasse`, `idUsu`) VALUES (?, ?);";
-    const VALUES = [idClass, idUsu];
+    const sql = "INSERT INTO `PERTENECE` (`idClase`, `idUsuario`) VALUES (?, ?);";  
+    const VALUES = [idClass, idUsuario];
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
         reject({ err: err });
@@ -165,7 +167,7 @@ function joinClasse(idClass, idUsu) {
 
 function getUserById(id) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM USUARIS WHERE idUsu = ?";
+    const sql = "SELECT * FROM USUARIOS WHERE idUsuario = ?";
     const VALUES = [id];
 
     conn.query(sql, VALUES, (err, result) => {
@@ -181,19 +183,19 @@ function getUserById(id) {
 function login(email, password) {
   return new Promise((resolve, reject) => {
     if (!email || !password) {
-      reject({ err: "Tant correu com la contrasenya són necessaris." });
+      reject({ err: "El correo y la contraseña son necesarios." });
     } else {
-      let sql = `SELECT * FROM USUARIS WHERE correu = '${email}'`;
+      let sql = `SELECT * FROM USUARIOS WHERE correo = '${email}'`;
 
       conn.query(sql, (err, result) => {
         if (err) {
           console.error(err);
-          reject({ err: "Hi han problemes en la base de dades, prova-ho mes tard." });
+          reject({ err: "Hay problemas en la base de datos, inténtalo más tarde." });
           return; // Termina la ejecución para evitar errores adicionales
         }
 
-        if (result.length === 0 || result[0].pass !== CryptoJS.MD5(password).toString()) {
-          reject({ err: "La contrasenya i/o el correu electrònic no són correctes." });
+        if (result.length === 0 || result[0].contrasena !== CryptoJS.MD5(password).toString()) {
+          reject({ err: "La contraseña y/o el correo electrónico no son correctos." });
           return; // Termina la ejecución para evitar errores adicionales
         }
 
@@ -204,17 +206,17 @@ function login(email, password) {
   });
 }
 
-function register(email, password, nom) {
+function register(name, email, password) {
   return new Promise((resolve, reject) => {
-    if (!email || !password || !nom) {
+    if (!name || !email || !password) {
       reject({ err: "All elements are required" });
     } else {
       const newUser = {
-        nom: nom,
-        pass: CryptoJS.MD5(password).toString(),
-        correu: email,
+        nombre: name,
+        contrasena: CryptoJS.MD5(password).toString(),
+        correo: email,
       };
-      let sql = `INSERT INTO USUARIS SET ?`;
+      let sql = `INSERT INTO USUARIOS SET ?`;
       conn.query(sql, newUser, (err, result) => {
         if (err) reject({ err: err.sqlMessage });
         resolve({ userData: result });
@@ -228,7 +230,7 @@ function changePassword(email, password) {
     if (!email || !password) {
       reject({ err: "Both email and password are required" });
     } else {
-      let sql = "UPDATE USUARIS SET pass = ? WHERE correu = ?";
+      let sql = "UPDATE USUARIOS SET contrasena = ? WHERE correo = ?";
       let VALUES = [CryptoJS.MD5(password).toString(), email];
       conn.query(sql, VALUES, (err, result) => {
         if (err) reject({ err: err });
@@ -240,7 +242,7 @@ function changePassword(email, password) {
 
 function getDificultats(idProfe) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT idDificultat, nomDificultat FROM DIFICULTAT WHERE idProfe = (?) or nomDificultat = 'Per defecte'";
+    const sql = "SELECT idDificultad, nomDificultad FROM DIFICULTAD WHERE idProfe = (?) or nomDificultad = 'Por defecto'";
     const VALUES = [idProfe];
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -252,10 +254,10 @@ function getDificultats(idProfe) {
   });
 }
 
-function setAvatar(id, idUsu) {
+function setAvatar(id, idUsuario) {
   return new Promise((resolve, reject) => {
-    const sql = "UPDATE USUARIS SET avatar = ? WHERE idUsu = ?";
-    const values = [id, idUsu, idUsu];
+    const sql = "UPDATE USUARIOS SET avatar = ? WHERE idUsuario = ?";
+    const values = [id, idUsuario, idUsuario];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
@@ -271,10 +273,10 @@ function setAvatar(id, idUsu) {
   });
 }
 
-function buyedAvatars(idUsu) {
+function buyedAvatars(idUsuario) {
   return new Promise((resolve, reject) => {
     const sql = "SELECT avatar_number FROM COMPRASAVATARES WHERE user_id = ?; ";
-    const values = [idUsu];
+    const values = [idUsuario];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
@@ -286,11 +288,11 @@ function buyedAvatars(idUsu) {
   });
 }
 
-function sumarPunts(idUsu) {
+function sumarPunts(idUsuario) {
   return new Promise((resolve, reject) => {
 
-    const sql = "UPDATE USUARIS SET punts = punts + 10 WHERE idUsu = ?";
-    const values = [idUsu];
+    const sql = "UPDATE USUARIOS SET puntos = puntos + 10 WHERE idUsuario = ?";
+    const values = [idUsuario];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
@@ -302,10 +304,10 @@ function sumarPunts(idUsu) {
   });
 }
 
-function getPunts(idUsu) {
+function getPunts(idUsuario) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT punts FROM USUARIS WHERE idUsu = ?";
-    const values = [idUsu];
+    const sql = "SELECT puntos FROM USUARIOS WHERE idUsuario = ?";
+    const values = [idUsuario];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
@@ -317,36 +319,36 @@ function getPunts(idUsu) {
   });
 }
 
-function comprarAvatarSiTieneSuficientesPuntos(avatarNumber, idUsu) {
+function comprarAvatarSiTieneSuficientesPuntos(avatarNumber, idUsuario) {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT punts FROM USUARIS WHERE idUsu = ?";
-    const values = [idUsu];
+    const sql = "SELECT puntos FROM USUARIOS WHERE idUsuario = ?";
+    const values = [idUsuario];
 
     conn.query(sql, values, (err, result) => {
       if (err) {
         reject({ error: err });
       } else {
-        console.log(result[0].punts);
-        if (result[0] && result[0].punts >= 20 && avatarNumber == 1) {
-          insertCompraAvatar(avatarNumber, idUsu)
+        console.log(result[0].puntos);
+        if (result[0] && result[0].puntos >= 20 && avatarNumber == 1) {
+          insertCompraAvatar(avatarNumber, idUsuario)
             .then(resolve)
             .catch(reject);
-        } else if (result[0] && result[0].punts >= 50 && avatarNumber == 2) {
-          insertCompraAvatar(avatarNumber, idUsu)
+        } else if (result[0] && result[0].puntos >= 50 && avatarNumber == 2) {
+          insertCompraAvatar(avatarNumber, idUsuario)
             .then(resolve)
             .catch(reject);
             } else{
-          reject({ error: "No tens prous punts" });
+          reject({ error: "No tienes suficientes puntos" });
         }
       }
     });
   });
 }
 
-function insertCompraAvatar(avatarNumber, idUsu) {
+function insertCompraAvatar(avatarNumber, idUsuario) {
   return new Promise((resolve, reject) => {
     const sql = "INSERT INTO COMPRASAVATARES (user_id, avatar_number) VALUES (?, ?)";
-    const values = [idUsu, avatarNumber];
+    const values = [idUsuario, avatarNumber];
 
     conn.query(sql, values, (err, result) => {
       if (err) {

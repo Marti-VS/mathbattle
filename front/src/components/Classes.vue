@@ -31,8 +31,8 @@ export default {
       showDefaultDifficultyDialog: {},
       dificultats: [
         {
-          idDificultat: null,
-          nomDificultat: null,
+          idDificultad: null,
+          nomDificultad: null,
           idProfe: null,
         },
       ],
@@ -87,7 +87,7 @@ export default {
     },
     setClasseEditar(classe) {
       this.classeEditar = classe;
-      this.classeEditarNom = classe.nomClasse;
+      this.classeEditarNom = classe.nomClase;
       this.mostrarPopUpEditar = true;
     },
     goBack() {
@@ -113,10 +113,10 @@ export default {
         window.alert("Error al carregar les dificultats");
       } else {
         const data = await response.json();
-        this.dificultats = data;
+        this.dificultats = Array.isArray(data) ? data : [];
         var crearDificultat = {
-          idDificultat: null,
-          nomDificultat: "Crear dificultat",
+          idDificultad: null,
+          nomDificultad: "Crear dificultat",
           idProfe: null,
         };
         this.dificultats.push(crearDificultat);
@@ -124,16 +124,16 @@ export default {
 
       // Inicializa selectedDificultats para cada clase
       this.classes.forEach((classe) => {
-        this.selectedDificultats[classe.idClasse] = {
-          idDificultat: null,
-          nomDificultat: null,
+        this.selectedDificultats[classe.idClase] = {
+          idDificultad: null,
+          nomDificultad: null,
           idProfe: null,
         };
       });
     },
     checkDefaultDifficulty(selectedDificultat, classeId) {
       const isDefaultDifficulty =
-        selectedDificultat.nomDificultat == "Crear dificultat";
+        selectedDificultat.nomDificultad == "Crear dificultat";
 
       if (isDefaultDifficulty) {
         this.showDefaultDifficultyDialog[classeId] = true;
@@ -190,8 +190,8 @@ export default {
     await this.getDificultats();
 
     this.classes.forEach((classe) => {
-      this.selectedDificultats[classe.idClasse] = this.dificultats.find(
-        (dificultat) => dificultat.nomDificultat === "Per defecte"
+      this.selectedDificultats[classe.idClase] = this.dificultats.find(
+        (dificultat) => dificultat.nomDificultad === "Por defecto"
       );
     });
   },
@@ -200,17 +200,17 @@ export default {
 
 <template>
   <div
-    class="h-screen bg-[radial-gradient(rgba(173,216,230)_30%,rgba(81,180,213)_100%)]"
+    class="bg-[radial-gradient(rgba(173,216,230)_30%,rgba(81,180,213)_100%)] h-screen"
   >
     <div class="flex justify-start p-4 pl-12">
       <button
-        class="mt-5 bg-slate-200 rounded-full size-10 p-1 mr-4"
+        class="bg-slate-200 mt-5 mr-4 p-1 rounded-full size-10"
         @click="goBack()"
       >
-        <i class="icon-[mdi--arrow-left] size-8 backdrop-blur-sm"></i>
+        <i class="backdrop-blur-sm size-8 icon-[mdi--arrow-left]"></i>
       </button>
       <button
-        class="mt-5 py-2 rounded-lg bg-white text-[#72bae8] font-bold flex justify-start px-10 transition-all shadow-md shadow-black/20"
+        class="flex justify-start bg-white shadow-black/20 shadow-md mt-5 px-10 py-2 rounded-lg font-bold text-[#72bae8] transition-all"
         prepend-icon="mdi-plus"
         @click="mostrarPopUp = !mostrarPopUp"
       >
@@ -219,18 +219,18 @@ export default {
     </div>
     <div v-show="mostrarPopUp" key="1">
       <div
-        class="fixed inset-0 bg-gray-900 opacity-25 z-10"
+        class="z-10 fixed inset-0 bg-gray-900 opacity-25"
         @click="mostrarPopUp = !mostrarPopUp"
       ></div>
       <div
-        class="absolute w-full h-full flex items-center justify-center top-0"
+        class="top-0 absolute flex justify-center items-center w-full h-full"
       >
         <div
-          class="relative bg-white rounded-xl shadow-xl py-8 px-6 z-50 max-w-2xl"
+          class="z-50 relative bg-white shadow-xl px-6 py-8 rounded-xl max-w-2xl"
         >
-          <div class="rounded-xl flex py">
-            <div class="text-center mx-3">
-              <h1 class="text-gray-700 text-2xl font-bold">
+          <div class="flex rounded-xl py">
+            <div class="mx-3 text-center">
+              <h1 class="font-bold text-gray-700 text-2xl">
                 Crea una nova classe
               </h1>
               <form @submit.prevent="crearClase()" class="w-full">
@@ -239,7 +239,7 @@ export default {
                     type="text"
                     id="nombreNuevaClase"
                     v-model="nombreNuevaClase"
-                    class="border border-gray-300 rounded-md p-3 w-96 mt-5"
+                    class="mt-5 p-3 border border-gray-300 rounded-md w-96"
                     :class="{
                       'border-red-500':
                         errors.includes('Requerit') ||
@@ -259,14 +259,14 @@ export default {
                 <div class="flex justify-between mt-2">
                   <button
                     type="button"
-                    class="button-pop-up bg-red-400 hover:opacity-80 mr-3"
+                    class="bg-red-400 hover:opacity-80 mr-3 button-pop-up"
                     @click="mostrarPopUp = !mostrarPopUp"
                   >
                     CANCELAR
                   </button>
                   <button
                     type="submit"
-                    class="button-pop-up bg-blue-400 hover:hover:opacity-80"
+                    class="bg-blue-400 hover:hover:opacity-80 button-pop-up"
                   >
                     ACCEPTAR
                   </button>
@@ -278,62 +278,62 @@ export default {
       </div>
     </div>
     <div
-      class="mt-12 p-12 grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-5"
+      class="gap-5 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-12 p-12"
     >
       <div
         v-for="classe in classes"
-        :key="classe.idClasse"
-        class="bg-white rounded-lg border-[1px] border-[#d1e8f7)] shadow-lg relative overflow-hidden"
+        :key="classe.idClase"
+        class="relative bg-white shadow-lg border-[#d1e8f7)] border-[1px] rounded-lg overflow-hidden"
       >
-        <div class="relative z-0 px-6 py-4 bg-white">
-          <div class="absolute inset-0 w-full object-cover classe h-24 z-0">
-            <div class="h-24 ml-8 flex items-center">
-              <h1 class="text-black text-2xl font-bold h-fit">
-                {{ classe.nomClasse }}
+        <div class="z-0 relative bg-white px-6 py-4">
+          <div class="z-0 absolute inset-0 w-full h-24 object-cover classe">
+            <div class="flex items-center ml-8 h-24">
+              <h1 class="h-fit font-bold text-black text-2xl">
+                {{ classe.nomClase }}
               </h1>
             </div>
           </div>
           <div class="mt-24">
             <button
-              class="absolute bg-white hover:bg-slate-200 transition-all rounded-full size-10 flex items-center justify-center top-4 right-4"
+              class="top-4 right-4 absolute flex justify-center items-center bg-white hover:bg-slate-200 rounded-full size-10 transition-all"
               @click="setClasseEditar(classe)"
             >
-              <span class="icon-[tdesign--edit-2] size-5"></span>
+              <span class="size-5 icon-[tdesign--edit-2]"></span>
             </button>
             <div class="mt-2">
               <span
-                class="flex bg-blue-100 rounded-full px-3 py-1 text-sm font-semibold text-blue-500 mr-2 w-fit items-center"
+                class="flex items-center bg-blue-100 mr-2 px-3 py-1 rounded-full w-fit font-semibold text-blue-500 text-sm"
               >
                 {{ classe.numeroUsuarios }}
                 <span
-                  class="icon-[heroicons--users-16-solid] size-4 ml-1"
+                  class="ml-1 size-4 icon-[heroicons--users-16-solid]"
                 ></span>
               </span>
               <div class="flex gap-3">
                 <button
-                  class="button-pop-up bg-[#72bae8] focus:bg-[#5a97bd] text-white rounded-full p-2 mt-4 h-fit"
-                  @click="createSala(classe.idClasse)"
+                  class="bg-[#72bae8] focus:bg-[#5a97bd] mt-4 p-2 rounded-full h-fit text-white button-pop-up"
+                  @click="createSala(classe.idClase)"
                 >
                   COMENÇA
                 </button>
-                <div class="flex items-center justify-center w-full h-full">
+                <div class="flex justify-center items-center w-full h-full">
                   <div class="p-4">
                     <select
-                      v-model="selectedDificultats[classe.idClasse]"
-                      class="border border-gray-300 rounded p-3 min-w-36 w-full"
+                      v-model="selectedDificultats[classe.idClase]"
+                      class="p-3 border border-gray-300 rounded w-full min-w-36"
                       @change="
                         checkDefaultDifficulty(
-                          selectedDificultats[classe.idClasse],
-                          classe.idClasse
+                          selectedDificultats[classe.idClase],
+                          classe.idClase
                         )
                       "
                     >
                       <option
                         v-for="dificultat in dificultats"
-                        :key="dificultat.id"
+                        :key="dificultat.idDificultad"
                         :value="dificultat"
                       >
-                        {{ dificultat.nomDificultat }}
+                        {{ dificultat.nomDificultad }}
                       </option>
                     </select>
                   </div>
@@ -346,7 +346,7 @@ export default {
     </div>
     <div v-if="mostrarCrearDificultat">
       <div
-        class="fixed inset-0 bg-gray-900 opacity-25 z-10"
+        class="z-10 fixed inset-0 bg-gray-900 opacity-25"
         v-on:click="
           {
             mostrarCrearDificultat = !mostrarCrearDificultat;
@@ -354,29 +354,29 @@ export default {
         "
       ></div>
       <div
-        class="absolute w-full h-full flex items-center justify-center top-0"
+        class="top-0 absolute flex justify-center items-center w-full h-full"
       >
         <div
-          class="relative bg-white rounded-xl shadow-xl lg:w-1/3 p-2 md:w-2/4 z-50"
+          class="z-50 relative bg-white shadow-xl p-2 rounded-xl md:w-2/4 lg:w-1/3"
         >
-          <div class="bg-white rounded p-4">
-            <h2 class="text-center text-3xl font-bold mb-4">
+          <div class="bg-white p-4 rounded">
+            <h2 class="mb-4 font-bold text-3xl text-center">
               Crea una nova dificultat
             </h2>
             <form @submit.prevent="saveDifficulty">
               <div class="mb-4">
-                <label class="pl-1 opacity-80 block">
+                <label class="block opacity-80 pl-1">
                   Nom de la nova dificultat
                 </label>
                 <input
                   type="text"
                   placeholder="La meva dificultat"
                   v-model="nuevaDificultatNombre"
-                  class="border border-gray-300 rounded px-4 py-2 w-full"
+                  class="px-4 py-2 border border-gray-300 rounded w-full"
                   required
                 />
               </div>
-              <h3 class="text-center text-2xl font-bold mb-4">
+              <h3 class="mb-4 font-bold text-2xl text-center">
                 Afegir dificultats
               </h3>
               <div class="flex justify-center mb-6">
@@ -391,13 +391,13 @@ export default {
                 <button
                   type="button"
                   @click="cancelarCrearDificultat"
-                  class="bg-red-400 transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
+                  class="bg-red-400 hover:opacity-80 p-4 rounded w-full font-bold text-white transition-colors"
                 >
                   CANCELA
                 </button>
                 <button
                   type="submit"
-                  class="bg-[#72bae8] transition-colors hover:opacity-80 w-full text-white font-bold p-4 rounded"
+                  class="bg-[#72bae8] hover:opacity-80 p-4 rounded w-full font-bold text-white transition-colors"
                 >
                   DESA
                 </button>
@@ -409,27 +409,27 @@ export default {
     </div>
     <div v-if="mostrarPopUpEditar">
       <div
-        class="fixed inset-0 bg-gray-900 opacity-25 z-10"
+        class="z-10 fixed inset-0 bg-gray-900 opacity-25"
         @click="mostrarPopUpEditar = !mostrarPopUpEditar"
       ></div>
       <div
-        class="absolute w-full h-full flex items-center justify-center top-0"
+        class="top-0 absolute flex justify-center items-center w-full h-full"
       >
         <div
-          class="relative bg-white rounded-xl shadow-xl py-8 px-6 z-50 max-w-2xl w-96"
+          class="z-50 relative bg-white shadow-xl px-6 py-8 rounded-xl w-96 max-w-2xl"
         >
-          <div class="rounded-xl flex">
-            <h1 class="text-gray-700 text-2xl font-bold text-center">
+          <div class="flex rounded-xl">
+            <h1 class="font-bold text-gray-700 text-2xl text-center">
               Editar classe
             </h1>
           </div>
-          <div class="absolute top-8 right-6">
+          <div class="top-8 right-6 absolute">
             <button
               @click="eliminarClasse()"
-              class="rounded-full flex justify-center items-center size-8 bg-red-400 hover:bg-red-500 transition-all"
+              class="flex justify-center items-center bg-red-400 hover:bg-red-500 rounded-full size-8 transition-all"
             >
               <span
-                class="icon-[heroicons--trash-16-solid] size-4 text-white"
+                class="size-4 text-white icon-[heroicons--trash-16-solid]"
               ></span>
             </button>
           </div>
@@ -437,7 +437,7 @@ export default {
             <input
               type="text"
               placeholder="Nom"
-              class="w-full px-4 py-2 border rounded mb-2 focus:outline-none"
+              class="mb-2 px-4 py-2 border rounded focus:outline-none w-full"
               v-model="classeEditarNom"
               :class="
                 classeEditarNom.length < 3
@@ -454,14 +454,14 @@ export default {
             <div class="flex justify-between mt-4">
               <button
                 type="button"
-                class="button-pop-up bg-red-400 hover:bg-red-500 mr-3"
+                class="bg-red-400 hover:bg-red-500 mr-3 button-pop-up"
                 @click="mostrarPopUpEditar = !mostrarPopUpEditar"
               >
                 CANCELAR
               </button>
               <button
                 type="submit"
-                class="button-pop-up bg-[#72bae8] hover:bg-blue-500"
+                class="bg-[#72bae8] hover:bg-blue-500 button-pop-up"
               >
                 ACCEPTAR
               </button>
