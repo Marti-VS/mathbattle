@@ -178,18 +178,18 @@ export default {
 </script>
 
 <template>
-  <div class="h-screen flex justify-center">
-    <div class="flex flex-col items-center justify-center gap-4">
-      <div class="p-10 bg-gray-100 shadow-xl rounded-2xl">
-        <h1 class="text-5xl font-bold mb-6 text-center">UNEIX-TE</h1>
+  <div class="z-2 flex justify-center h-screen">
+    <div class="flex flex-col justify-center items-center gap-4">
+      <div class="bg-gray-100 shadow-xl p-10 rounded-2xl">
+        <h1 class="mb-6 font-bold text-5xl text-center">UNEIX-TE</h1>
         <form @submit.prevent>
           <div class="flex my-3">
-            <input type="text" maxlength="1" class="input mr-1 font-bold" />
-            <input type="text" maxlength="1" class="input mr-1 font-bold" />
-            <input type="text" maxlength="1" class="input mr-1 font-bold" />
-            <input type="text" maxlength="1" class="input mr-1 font-bold" />
-            <input type="text" maxlength="1" class="input mr-1 font-bold" />
-            <input type="text" maxlength="1" class="input font-bold" />
+            <input type="text" maxlength="1" class="mr-1 font-bold input" />
+            <input type="text" maxlength="1" class="mr-1 font-bold input" />
+            <input type="text" maxlength="1" class="mr-1 font-bold input" />
+            <input type="text" maxlength="1" class="mr-1 font-bold input" />
+            <input type="text" maxlength="1" class="mr-1 font-bold input" />
+            <input type="text" maxlength="1" class="font-bold input" />
             <div class="paste-btn-container">
               <button class="paste-btn" @click="() => pasteCode()">
                 <svg fill="black" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
@@ -202,22 +202,22 @@ export default {
           </div>
           <div class="mt-3 text-center">
             <button
-              class="bg-gradient-to-tr from-[#3431b4] to-[#07bad1] text-white bg-[200%_auto] bg-[center_center] text-[17px] font-medium tracking-[2.5px] transition-[background-position] duration-[0.15s] ease-[ease-in-out] mt-[25px] px-[1.5em] py-[0.6em] rounded-[30px] border-[none] hover:bg-[left_center] hover:animate-[pulse512_1.5s_infinite]"
+              class="bg-[200%_auto] bg-[center_center] hover:bg-[left_center] bg-gradient-to-tr from-[#3431b4] to-[#07bad1] mt-[25px] px-[1.5em] py-[0.6em] border-[none] rounded-[30px] font-medium text-[17px] text-white tracking-[2.5px] transition-[background-position] hover:animate-[pulse512_1.5s_infinite] duration-[0.15s] ease-[ease-in-out]"
               @click="onSubmit">
               JUGAR
             </button>
           </div>
         </form>
 
-        <div class="text-center mt-3 font-bold">
+        <div class="mt-3 font-bold text-center">
           <a href="/class" class="text-blue-500 hover:underline">Crea una sala</a>
         </div>
-        <div class="text-center mt-5 font-bold relative">
+        <div class="relative mt-5 font-bold text-center">
           <p
-            class="absolute bottom-4 left-56 animate-pulse rotate-12 rounded-full text-xs bg-orange-400 px-2 py-1 z-10">
+            class="bottom-4 left-56 z-10 absolute bg-orange-400 px-2 py-1 rounded-full text-xs rotate-12 animate-pulse">
             Nou!</p>
           <a href="/practice"
-            class="bg-gradient-to-tr from-[#b47731] to-[#d11407] text-white bg-[200%_auto] bg-[center_center] text-lg font-medium tracking-wider transition-[background-position] duration-[0.15s] ease-[ease-in-out] mt-[25px] px-4 py-2 rounded-full hover:opacity-90">Mode
+            class="bg-[200%_auto] bg-[center_center] bg-gradient-to-tr from-[#b47731] to-[#d11407] hover:opacity-90 mt-[25px] px-4 py-2 rounded-full font-medium text-white text-lg tracking-wider transition-[background-position] duration-[0.15s] ease-[ease-in-out]">Mode
             pràctica</a>
         </div>
       </div>
@@ -231,7 +231,7 @@ export default {
 }
 
 .input {
-  @apply block w-12 h-14 text-center text-lg min-w-0 border border-gray-300 focus:outline-none transition-all duration-300 transform hover:scale-95;
+  @apply block border border-gray-300 focus:outline-none w-12 min-w-0 h-14 text-lg text-center hover:scale-95 transition-all duration-300 transform;
 }
 
 .title {

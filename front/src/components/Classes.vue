@@ -6,8 +6,8 @@ import { getState as getSocket } from "../store/socketStore.js";
 import {
   getClassesFetch,
   createClasse,
-  editClasse,
-  deleteClasse,
+  editClase,
+  deleteClase,
   addDificultat,
   addOperation,
   getDificultatsFetch,
@@ -75,9 +75,9 @@ export default {
     },
     async editarClasse() {
       if (this.classeEditarNom.length > 2) {
-        this.classeEditar.nombreNuevaClasse = this.classeEditarNom;
+        this.classeEditar.nombreClase = this.classeEditarNom;
 
-        const response = await editClasse(this.classeEditar);
+        const response = await editClase(this.classeEditar);
 
         if (response.ok) {
           this.mostrarPopUpEditar = false;
@@ -85,9 +85,9 @@ export default {
         }
       }
     },
-    setClasseEditar(classe) {
+    setClaseEditar(classe) {
       this.classeEditar = classe;
-      this.classeEditarNom = classe.nomClase;
+      this.classeEditarNom = classe.nombreClase;
       this.mostrarPopUpEditar = true;
     },
     goBack() {
@@ -100,8 +100,8 @@ export default {
       setState({ usuari: { ...getState().usuari, classe: id } });
       window.location.href = "/lobby";
     },
-    async eliminarClasse() {
-      const response = await deleteClasse(this.classeEditar);
+    async eliminarClase() {
+      const response = await deleteClase(this.classeEditar);
       if (response.ok) {
         this.mostrarPopUpEditar = false;
         this.getClasses();
@@ -289,14 +289,14 @@ export default {
           <div class="z-0 absolute inset-0 w-full h-24 object-cover classe">
             <div class="flex items-center ml-8 h-24">
               <h1 class="h-fit font-bold text-black text-2xl">
-                {{ classe.nomClase }}
+                {{ classe.nombreClase }}
               </h1>
             </div>
           </div>
           <div class="mt-24">
             <button
               class="top-4 right-4 absolute flex justify-center items-center bg-white hover:bg-slate-200 rounded-full size-10 transition-all"
-              @click="setClasseEditar(classe)"
+              @click="setClaseEditar(classe)"
             >
               <span class="size-5 icon-[tdesign--edit-2]"></span>
             </button>
@@ -425,7 +425,7 @@ export default {
           </div>
           <div class="top-8 right-6 absolute">
             <button
-              @click="eliminarClasse()"
+              @click="eliminarClase()"
               class="flex justify-center items-center bg-red-400 hover:bg-red-500 rounded-full size-8 transition-all"
             >
               <span
@@ -440,14 +440,14 @@ export default {
               class="mb-2 px-4 py-2 border rounded focus:outline-none w-full"
               v-model="classeEditarNom"
               :class="
-                classeEditarNom.length < 3
+                (classeEditarNom?.length ?? 0) < 3
                   ? 'border-red-500'
                   : 'border-gray-300 focus:border-blue-500'
               "
             />
             <p
-              v-if="classeEditarNom.length < 3"
-              :class="classeEditarNom.length < 3 ? 'text-red-500' : ''"
+              v-if="(classeEditarNom?.length ?? 0) < 3"
+              :class="(classeEditarNom?.length ?? 0) < 3 ? 'text-red-500' : ''"
             >
               Mínim 3 caràcters.
             </p>

@@ -1,7 +1,7 @@
 //IMPORTAR MODULOS
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3751;
+const port = 3751;
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
@@ -111,7 +111,7 @@ app.post("/addOperation", async (req, res) => {
 
 //ruta para editar clases
 app.post("/editarClasse", async (req, res) => {
-  await editClass(req.body.nomClasse, req.body.idClasse)
+  await editClass(req.body.nombreClase, req.body.idClase)
     .then((data) => {
       res.send(data);
     })
@@ -121,8 +121,8 @@ app.post("/editarClasse", async (req, res) => {
 });
 
 //ruta para eliminar clases
-app.post("/eliminarClasse", async (req, res) => {
-  await deleteClass(req.body.idClasse)
+app.post("/eliminarClase", async (req, res) => {
+  await deleteClass(req.body.idClase)
     .then((data) => {
       res.send(data);
     })

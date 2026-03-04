@@ -133,7 +133,7 @@ export function addOperation(
   });
 }
 
-export function editClasse(classeEditar) {
+export function editClase(claseEditar) {
   return new Promise((resolve, reject) => {
     fetch(NODE + `/editarClasse/`, {
       method: "POST",
@@ -141,22 +141,22 @@ export function editClasse(classeEditar) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nomClasse: classeEditar.nombreNuevaClasse,
-        idClasse: classeEditar.idClasse,
+        nombreClase: claseEditar.nombreClase,
+        idClase: claseEditar.idClase,
       }),
     }).then((response) => resolve(response));
   });
 }
 
-export function deleteClasse(classeEditar) {
+export function deleteClase(claseEditar) {
   return new Promise((resolve, reject) => {
-    fetch(NODE + `/eliminarClasse/`, {
+    fetch(NODE + `/eliminarClase/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        idClasse: classeEditar.idClasse,
+        idClase: claseEditar.idClase,
       }),
     }).then((response) => resolve(response));
   });

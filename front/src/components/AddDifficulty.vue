@@ -118,37 +118,37 @@ export default {
       {{ jsonDificultat[dificultat].text }}
       <p v-if="!jsonDificultat[dificultat].guardat" class="text-sm lowercase">(buit)</p>
     </button>
-    <div v-if="modalDificultat" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div v-if="modalDificultat" class="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div class="bg-white p-8 rounded-lg max-w-md">
-        <h2 class="text-center text-2xl font-bold pb-4">Dificultat {{ jsonDificultat[dificultat].text }}</h2>
+        <h2 class="pb-4 font-bold text-2xl text-center">Dificultat {{ jsonDificultat[dificultat].text }}</h2>
         <form @submit.prevent="afegirDificultat">
-          <div class="flex flex-wrap items-center justify-center mb-4">
+          <div class="flex flex-wrap justify-center items-center mb-4">
             <input type="number" v-model="jsonDificultat[dificultat].num1Min" placeholder="num1 Mínim"
-              class="border-2 rounded-lg px-4 py-2 mr-2 mb-2">
+              class="mr-2 mb-2 px-4 py-2 border-2 rounded-lg">
             <input type="number" v-model="jsonDificultat[dificultat].num1Max" placeholder="num1 Màxim"
-              class="border-2 rounded-lg px-4 py-2 mb-2">
+              class="mb-2 px-4 py-2 border-2 rounded-lg">
           </div>
-          <div class="flex items-center justify-center mb-4">
-            <select v-model="jsonDificultat[dificultat].operador" class="border-2 rounded-lg px-4 py-2">
+          <div class="flex justify-center items-center mb-4">
+            <select v-model="jsonDificultat[dificultat].operador" class="px-4 py-2 border-2 rounded-lg">
               <option v-for="operator in ['+', '-', '*', '/', '^', '√']" :key="operator">{{ operator }}</option>
             </select>
           </div>
-          <div class="flex flex-wrap items-center justify-center mb-4">
+          <div class="flex flex-wrap justify-center items-center mb-4">
             <input type="number" v-model="jsonDificultat[dificultat].num2Min" placeholder="num2 Mínim"
-              class="border-2 rounded-lg px-4 py-2 mr-2 mb-2">
+              class="mr-2 mb-2 px-4 py-2 border-2 rounded-lg">
             <input type="number" v-model="jsonDificultat[dificultat].num2Max" placeholder="num2 Màxim"
-              class="border-2 rounded-lg px-4 py-2 mb-2">
+              class="mb-2 px-4 py-2 border-2 rounded-lg">
           </div>
-          <div class="text-center mb-4">
+          <div class="mb-4 text-center">
             <p class="font-bold">{{ operacioExemple }}</p>
-            <button @click="exempleOperacio"
-              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">Generar exemple</button>
+            <button type="button" @click="exempleOperacio"
+              class="bg-blue-500 hover:bg-blue-700 mt-2 px-4 py-2 rounded font-bold text-white">Generar exemple</button>
           </div>
           <div class="flex justify-center">
             <button type="submit" @click="afegirDificultat"
-              class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">Afegir</button>
+              class="bg-green-500 hover:bg-green-700 mr-4 px-4 py-2 rounded font-bold text-white">Afegir</button>
             <button @click="toggleModal"
-              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Cancela</button>
+              class="bg-red-500 hover:bg-red-700 px-4 py-2 rounded font-bold text-white">Cancela</button>
           </div>
         </form>
       </div>

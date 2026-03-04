@@ -175,46 +175,47 @@ export default {
 
 <template>
   <div v-if="partida">
-    <div class="px-12 py-5 grid grid-cols-2 text-2xl font-bold">
+    <!-- Barras de vida -->
+    <div class="grid grid-cols-2 px-12 py-5 font-bold text-2xl">
       <div class="w-full">
         <h2>{{ partida.jugadores[idPlayer].username }}</h2>
         <div
-          class="PS-container"
+          class="flex bg-[rgb(255,92,92)] w-[60%]"
           :class="{ shake: hit == 0, damageAnimation: hit == 0 }"
         >
           <div
-            class="PS"
-            v-bind:style="{
-              width: partida.jugadores[idPlayer].vida + '%',
-            }"
+            class="ps-bar"
+            v-bind:style="{ width: partida.jugadores[idPlayer].vida + '%' }"
           >
-            <p>{{ partida.jugadores[idPlayer].vida }}</p>
+            <p class="p-[10px] font-extrabold text-[23px] text-green-700">
+              {{ partida.jugadores[idPlayer].vida }}
+            </p>
           </div>
         </div>
       </div>
-      <div class="w-full flex flex-col items-end text-2xl">
+      <div class="flex flex-col items-end w-full text-2xl">
         <h2 v-if="hit == 1"></h2>
-        <h2>
-          {{ partida.jugadores[idPlayer == 1 ? 0 : 1].username }}
-        </h2>
+        <h2>{{ partida.jugadores[idPlayer == 1 ? 0 : 1].username }}</h2>
         <div
-          class="PS-container"
+          class="flex bg-[rgb(255,92,92)] w-[60%]"
           :class="{ shake: hit == 1, damageAnimation: hit == 1 }"
         >
           <div
-            class="PS"
-            v-bind:style="{
-              width: partida.jugadores[idPlayer == 1 ? 0 : 1].vida + '%',
-            }"
+            class="ps-bar"
+            v-bind:style="{ width: partida.jugadores[idPlayer == 1 ? 0 : 1].vida + '%' }"
           >
-            <p>{{ partida.jugadores[idPlayer == 1 ? 0 : 1].vida }}</p>
+            <p class="p-[10px] font-extrabold text-[23px] text-green-700">
+              {{ partida.jugadores[idPlayer == 1 ? 0 : 1].vida }}
+            </p>
           </div>
         </div>
       </div>
     </div>
-    <div class="w-full grid grid-cols-2 justify-items-center">
+
+    <!-- Avatares -->
+    <div class="justify-items-center grid grid-cols-2 w-full">
       <div>
-        <div class="avatar-container no-bottom-lg" id="avatar-one">
+        <div class="flex mr-[15px] avatar-pos" id="avatar-one">
           <img
             :src="
               partida.jugadores[idPlayer].avatar == 0
@@ -229,7 +230,7 @@ export default {
         </div>
       </div>
       <div>
-        <div class="avatar-container no-bottom-lg" id="avatar-two">
+        <div class="flex ml-5 avatar-pos" id="avatar-two">
           <img
             :src="
               partida.jugadores[idPlayer == 1 ? 0 : 1].avatar == 0
@@ -239,14 +240,16 @@ export default {
                 : Fraccionado.src
             "
             alt="Avatar"
-            class="size-72 scale-x scale-x-[-1]"
+            class="size-72 scale-x-[-1]"
           />
         </div>
       </div>
     </div>
-    <div class="flex flex-col justify-center items-center text-center m-auto">
+
+    <!-- Operación e input -->
+    <div class="flex flex-col justify-center items-center m-auto text-center">
       <div
-        class="bg-slate-100 rounded-lg flex justify-center transition-colors items-center w-2/6"
+        class="flex justify-center items-center bg-slate-100 rounded-lg w-2/6 transition-colors"
         :class="
           dificultad === 0
             ? 'border-4 border-green-500'
@@ -255,409 +258,145 @@ export default {
             : 'border-4 border-red-500'
         "
       >
-        <span class="text-6xl font-bold p-3"
-          ><b>{{
+        <span class="p-3 font-bold text-6xl">
+          <b>{{
             partida.jugadores[idPlayer].operacion == ""
               ? ""
-              : partida.jugadores[idPlayer].operacion[dificultad].includes(
-                  "Math.sqrt"
-                )
-              ? partida.jugadores[idPlayer].operacion[dificultad].replace(
-                  /Math\.sqrt\((\d+)\)/g,
-                  "√$1"
-                )
+              : partida.jugadores[idPlayer].operacion[dificultad].includes("Math.sqrt")
+              ? partida.jugadores[idPlayer].operacion[dificultad].replace(/Math\.sqrt\((\d+)\)/g, "√$1")
               : partida.jugadores[idPlayer].operacion[dificultad].includes("**")
-              ? partida.jugadores[idPlayer].operacion[dificultad].replace(
-                  /\*\*(\d+)/g,
-                  "^$1"
-                )
+              ? partida.jugadores[idPlayer].operacion[dificultad].replace(/\*\*(\d+)/g, "^$1")
               : partida.jugadores[idPlayer].operacion[dificultad]
-          }}</b></span
-        >
+          }}</b>
+        </span>
       </div>
-      <div class="justify-center flex flex-col">
-        <p class="text-2xl font-extrabold">=</p>
+      <div class="flex flex-col justify-center">
+        <p class="font-extrabold text-2xl">=</p>
         <input
           placeholder="?"
           id="res"
           type="number"
-          class="rounded number-input h-20 w-40 text-center text-6xl bg-gray-100 border-4 border-gray-300 focus:border-blue-500 transition-colors duration-200"
+          class="bg-gray-100 border-4 border-gray-300 focus:border-blue-500 rounded w-40 h-20 text-6xl text-center transition-colors duration-200 number-input"
           :class="{ shake: incorrectResult }"
           v-model="result"
         />
         <button
-          class="bg-blue-400 rounded-md p-2 block w-full mt-2 text-white font-bold transition-colors duration-200 hover:bg-blue-500"
+          class="block bg-blue-400 hover:bg-blue-500 mt-2 p-2 rounded-md w-full font-bold text-white transition-colors duration-200"
           @click="solveOperation()"
         >
           Resoldre
         </button>
       </div>
     </div>
-    <div class="flex justify-center mt-10 gap-3">
+
+    <!-- Botones de dificultad -->
+    <div class="flex justify-center gap-3 mt-10">
       <button
-        class="dificulty-option bg-[#7ed776] border-4 border-[#7ed776] transition-colors duration-200 items-center flex flex-col justify-center rounded-lg hover:bg-[#71c469] hover:border-green-600"
-        :class="dificultad == 0 ? 'focus-border-color' : ''"
+        class="flex flex-col justify-center items-center bg-[#7ed776] hover:bg-[#71c469] mt-5 md:mt-0 border-[#7ed776] border-4 hover:border-green-600 rounded-lg w-[200px] h-[100px] md:h-[150px] font-extrabold text-[25px] transition-colors duration-200"
+        :class="dificultad == 0 ? '!border-[5px] !border-black/30' : ''"
         @click="changeDificulty(0)"
       >
         Fàcil
         <br />
-        <div
-          class="w-1/3 text-xl rounded-full bg-orange-400 border-[2px] border-orange-600 justify-center flex gap-1 items-center"
-        >
+        <div class="flex justify-center items-center gap-1 bg-orange-400 border-[2px] border-orange-600 rounded-full w-1/3 text-xl">
           10
           <i class="icon-[ph--sword]"></i>
         </div>
       </button>
       <button
-        class="dificulty-option bg-[#768ed7] border-4 border-[#768ed7] transition-colors duration-200 items-center flex flex-col justify-center rounded-lg hover:bg-[#6c7fc4] hover:border-blue-600"
-        :class="dificultad == 1 ? 'focus-border-color' : ''"
+        class="flex flex-col justify-center items-center bg-[#768ed7] hover:bg-[#6c7fc4] mt-5 md:mt-0 border-[#768ed7] border-4 hover:border-blue-600 rounded-lg w-[200px] h-[100px] md:h-[150px] font-extrabold text-[25px] transition-colors duration-200"
+        :class="dificultad == 1 ? '!border-[5px] !border-black/30' : ''"
         @click="changeDificulty(1)"
       >
         Mitjà
         <br />
-        <div
-          class="w-1/3 text-xl rounded-full bg-orange-400 border-[2px] border-orange-600 justify-center flex gap-1 items-center"
-        >
+        <div class="flex justify-center items-center gap-1 bg-orange-400 border-[2px] border-orange-600 rounded-full w-1/3 text-xl">
           15
           <i class="icon-[ph--sword]"></i>
         </div>
       </button>
       <button
-        class="dificulty-option bg-[#d77676] border-4 border-[#d77676] transition-colors duration-200 items-center flex flex-col justify-center rounded-lg hover:bg-[#c46969] hover:border-red-500"
-        :class="dificultad == 2 ? 'focus-border-color' : ''"
+        class="flex flex-col justify-center items-center bg-[#d77676] hover:bg-[#c46969] mt-5 md:mt-0 border-[#d77676] border-4 hover:border-red-500 rounded-lg w-[200px] h-[100px] md:h-[150px] font-extrabold text-[25px] transition-colors duration-200"
+        :class="dificultad == 2 ? '!border-[5px] !border-black/30' : ''"
         @click="changeDificulty(2)"
       >
         Difícil
-        <div
-          class="w-1/3 text-xl rounded-full bg-orange-400 border-[2px] border-orange-600 justify-center flex gap-1 items-center"
-        >
+        <div class="flex justify-center items-center gap-1 bg-orange-400 border-[2px] border-orange-600 rounded-full w-1/3 text-xl">
           20
           <i class="icon-[ph--sword]"></i>
         </div>
       </button>
     </div>
-    <div v-if="canPlayModal" :timeout="2000" color="error" class="text-center">
+
+    <!-- Modal sala cerrada -->
+    <div v-if="canPlayModal" class="mt-4 text-center">
       <p class="text-center">El profesor ha tancat la sala</p>
-      <template>
-        <button color="white" variant="text" @click="canPlayModal = false">
-          <svg
-            fill="white"
-            xmlns="http://www.w3.org/2000/svg"
-            height="18"
-            viewBox="0 -960 960 960"
-            width="18"
-          >
-            <path
-              d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
-            />
-          </svg>
-        </button>
-      </template>
+      <button class="mt-2 p-1" @click="canPlayModal = false">
+        <svg
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          height="18"
+          viewBox="0 -960 960 960"
+          width="18"
+        >
+          <path
+            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
+          />
+        </svg>
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.avatar-container#avatar-one {
-  margin-right: 15px;
-}
-
-.avatar-container#avatar-two {
-  margin-left: 20px;
-}
-
-.my-app-background {
-  background-color: lightblue;
-  overflow: hidden;
-}
-
-.game-container {
-  height: 100vh;
-}
-
-.avatar-container {
-  display: flex;
-}
-
+/* Input numérico: sin flechas (no tiene equivalente Tailwind) */
 .number-input::-webkit-inner-spin-button,
 .number-input::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 .number-input {
   -moz-appearance: textfield;
 }
 
-.focus-border-color {
-  border: 5px solid #00000057;
-}
-
-.damage-container1 {
-  position: absolute;
-  background-color: blueviolet;
-  margin-top: 30px;
-  margin-left: 250px;
-  font-size: 45px;
-}
-
-.damage-container2 {
-  position: absolute;
-  background-color: blueviolet;
-  margin-top: 30px;
-  margin-left: 20px;
-  font-size: 45px;
-}
-
-.input-operation {
-  width: 500px;
-  margin-top: 20px;
-  align-items: center;
-}
-
-.bottom-aligned-col {
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-}
-
-.input-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin: auto;
-}
-
-.operation-box {
-  width: 700px;
-  background-color: white;
-  border-radius: 5px;
-  height: 100px;
-}
-
-.operation-label {
-  text-align: center;
-  font-size: 60px;
-  /* margin-top: 2px;
-  margin-bottom: 2px; */
-  position: relative;
-  bottom: 10px;
-}
-
-.PS {
-  font-weight: 800;
-  font-size: 23px;
-  width: 60%;
-  background-color: rgb(153, 153, 153);
-}
-
-.content-wrap {
-  padding-bottom: 10px;
-}
-
-.PS-container {
-  background: rgb(255, 92, 92);
-  width: 60%;
-  display: flex;
-}
-
-.PS {
+/* Barra de vida: imagen de fondo local */
+.ps-bar {
   background: url("../assets/BackgroundGreen.png") center center no-repeat;
   background-size: cover;
 }
 
-.PS p {
-  font-weight: 800;
-  font-size: 23px;
-  padding: 10px;
-  color: green;
-}
-
-.dificulty-option {
-  font-size: 25px !important;
-  font-weight: 800 !important;
-  height: 150px !important;
-  width: 200px;
-}
-
-.game-bar {
-  width: 100%;
-  height: fit-content;
-  display: flex;
-  align-items: center;
-}
-
+/* Animación shake */
 .shake {
   animation: shake 0.12s cubic-bezier(0.36, 0.07, 0.19, 0.97) both infinite;
   transform: translate3d(0, 0, 0);
 }
 
-@media only screen and (max-width: 830px) {
-  .avatar-container {
-    margin: 0;
-  }
-
-  .avatar-container#avatar-one {
-    margin-right: 15px;
-  }
-
-  .avatar-container#avatar-two {
-    margin-left: 15px;
-  }
-
-  .operation-label {
-    position: relative;
-    bottom: 10px;
-    font-size: 47px;
-  }
-
-  .operation-box {
-    width: 450px;
-    height: 80px;
-    margin-top: 40px;
-  }
-
-  .input-operation {
-    margin-top: 5px;
-  }
-
-  .dificulty-option {
-    margin-top: 20px;
-    font-size: 25px !important;
-    font-weight: 800 !important;
-    height: 100px !important;
-    width: 200px;
-  }
+/* Animación daño */
+.damageAnimation {
+  animation: damageAnimation 0.5s ease-out forwards;
 }
 
-@media only screen and (min-width: 831px) and (max-width: 960px) {
-  .avatar-container {
-    margin: 0;
-  }
-
-  .avatar-container#avatar-one {
-    margin-right: 15px;
-  }
-
-  .avatar-container#avatar-two {
-    margin-left: 15px;
-  }
-
-  .operation-label {
-    position: relative;
-    bottom: 10px;
-    font-size: 47px;
-  }
-
-  .operation-box {
-    width: 500px;
-    height: 80px;
-    margin-top: 10px;
-  }
-
-  .input-operation {
-    margin-top: 5px;
-  }
-
-  .btnSolve {
-    margin-bottom: 15px;
-  }
-}
-
-@media only screen and (min-width: 960px) and (max-width: 1280px) {
-  .game-container {
-    height: 100vh;
-  }
-
-  .operation-label {
-    position: relative;
-    bottom: 10px;
-    font-size: 47px;
-  }
-
-  .operation-box {
-    width: 500px;
-    height: 80px;
-    margin-top: 10px;
-  }
-
-  .input-operation {
-    margin-top: 5px;
-  }
-
-  .btnSolve {
-    margin-bottom: 15px;
-  }
-}
-
+/* Posición avatar: breakpoint 1919px no disponible en Tailwind estándar */
 @media only screen and (max-width: 1919px) {
-  .avatar-container {
+  .avatar-pos {
     position: relative;
     bottom: 50px;
   }
 }
 
-@media only screen and (min-width: 1920px) {
-  .no-bottom-lg {
-    margin-bottom: 0 !important;
-  }
-
-  .btnSolve {
-    margin-top: -3px;
-  }
-}
-
 @keyframes shake {
-  0% {
-    transform: translateX(0);
-    border: 1px solid red;
-  }
-
-  25% {
-    transform: translateX(3px);
-    border: 2px solid red;
-  }
-
-  50% {
-    transform: translateX(-3px);
-    border: 3px solid red;
-  }
-
-  75% {
-    transform: translateX(3px);
-    border: 2px solid red;
-  }
-
-  100% {
-    transform: translateX(0);
-    border: 1px solid red;
-  }
+  0%   { transform: translateX(0);   border: 1px solid red; }
+  25%  { transform: translateX(3px); border: 2px solid red; }
+  50%  { transform: translateX(-3px);border: 3px solid red; }
+  75%  { transform: translateX(3px); border: 2px solid red; }
+  100% { transform: translateX(0);   border: 1px solid red; }
 }
 
 @keyframes damageAnimation {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  25% {
-    transform: translateY(20px) translateX(2px);
-  }
-
-  50% {
-    opacity: 0.7;
-    transform: translateY(30px) translateX(-2px);
-  }
-
-  75% {
-    transform: translateY(40px) translateX(2px);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(50px) translateX(2px);
-  }
+  0%   { opacity: 1;   transform: translateY(0); }
+  25%  {               transform: translateY(20px) translateX(2px); }
+  50%  { opacity: 0.7; transform: translateY(30px) translateX(-2px); }
+  75%  {               transform: translateY(40px) translateX(2px); }
+  100% { opacity: 0;   transform: translateY(50px) translateX(2px); }
 }
 </style>

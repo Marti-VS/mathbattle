@@ -13,7 +13,69 @@ import { ViewTransitions } from 'astro:transitions';
 		<title>MathBattle</title>
 		<ViewTransitions />
 	</head>
-	<body class="h-screen bg-[radial-gradient(rgba(173,216,230)_30%,rgba(81,180,213)_100%)]">
+	<body class="bg-[radial-gradient(rgba(173,216,230)_30%,rgba(81,180,213)_100%)] h-screen">
+		<div id="math-particles" class="-z-10 fixed inset-0 overflow-hidden pointer-events-none"></div>
 		<slot />
 	</body>
 </html>
+
+<style is:global>
+.mp-particle {
+  position: absolute;
+  bottom: 0;
+  font-weight: 800;
+  user-select: none;
+  animation-name: mpFloatUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+@keyframes mpFloatUp {
+  0%   { transform: translateY(0vh)   translateX(0px)                   scale(0.2) rotate(0deg);              opacity: 0; }
+  6%   { transform: translateY(-6vh)  translateX(calc(var(--dx)*0.1))   scale(0.8) rotate(calc(var(--rot)*0.05)); opacity: 1; }
+  15%  { transform: translateY(-15vh) translateX(calc(var(--dx)*0.5))   scale(var(--sm))  rotate(calc(var(--rot)*0.15)); opacity: 1; }
+  30%  { transform: translateY(-30vh) translateX(var(--dx))             scale(var(--sm))  rotate(calc(var(--rot)*0.3));  opacity: 1; }
+  45%  { transform: translateY(-45vh) translateX(calc(var(--dx)*0.5))   scale(var(--sm))  rotate(calc(var(--rot)*0.45)); opacity: 0.95; }
+  60%  { transform: translateY(-60vh) translateX(0px)                   scale(calc(var(--sm)*0.8)) rotate(calc(var(--rot)*0.6));  opacity: 0.85; }
+  72%  { transform: translateY(-72vh) translateX(calc(var(--dx)*-0.4))  scale(calc(var(--sm)*0.55)) rotate(calc(var(--rot)*0.72)); opacity: 0.6; }
+  84%  { transform: translateY(-84vh) translateX(calc(var(--dx)*-0.2))  scale(0.25) rotate(calc(var(--rot)*0.9)); opacity: 0.25; }
+  100% { transform: translateY(-105vh) translateX(0px)                  scale(0)    rotate(var(--rot));         opacity: 0; }
+}
+</style>
+
+<script>
+  const SYMBOLS = ['+','-','×','÷','=','%','√','<','>','≤','≥','≠','±','π','∞','1','2','3','4','5','6','7','8','9','0'];
+  const COLORS  = ['#ff6b6b','#ff9940','#ffd43b','#aadd44','#ff79b0','#e05cbf','#a855f7','#6c63d8','#34d399','#2da84e','#fb923c','#facc15','#c084fc','#86efac'];
+  const rand = (a: number, b: number) => Math.random() * (b - a) + a;
+
+  function initParticles() {
+    const container = document.getElementById('math-particles');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const shuffled = [...SYMBOLS].sort(() => Math.random() - 0.5);
+    const count    = Math.min(25, shuffled.length);
+
+    for (let i = 0; i < count; i++) {
+      const dx  = rand(-70, 70);
+      const rot = Math.max(-180, Math.min(180, dx * 1.2));
+      const el  = document.createElement('span');
+      el.className   = 'mp-particle';
+      el.textContent = shuffled[i];
+      el.style.left              = rand(2, 98) + '%';
+      el.style.fontSize          = rand(18, 40) + 'px';
+      el.style.color             = COLORS[Math.floor(Math.random() * COLORS.length)];
+      el.style.animationDuration = rand(14, 28) + 's';
+      el.style.animationDelay    = rand(0, 12) + 's';
+      el.style.setProperty('--dx',  dx  + 'px');
+      el.style.setProperty('--rot', rot + 'deg');
+      el.style.setProperty('--sm',  String(rand(1.0, 1.5)));
+      container.appendChild(el);
+    }
+  }
+
+  // Se ejecuta en la carga inicial y tras cada navegación con ViewTransitions
+  document.addEventListener('astro:page-load', initParticles);
+</script>

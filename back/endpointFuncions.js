@@ -58,10 +58,10 @@ function addOperation(num1Min, num1Max, operador, num2Min, num2Max, idDificultat
   });
 }
 
-function editClass(nomClasse, idClasse) {
+function editClass(nombreClase, idClase) {
   return new Promise((resolve, reject) => {
     const sql = "UPDATE CLASE SET nombreClase = ? WHERE idClase = ?";
-    const VALUES = [nomClasse, idClasse];
+    const VALUES = [nombreClase, idClase];
 
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
@@ -73,10 +73,10 @@ function editClass(nomClasse, idClasse) {
   });
 }
 
-function deleteClass(idClasse) {
+function deleteClass(idClase) {
   return new Promise((resolve, reject) => {
     const sql = "DELETE FROM CLASE WHERE idClase = ?";
-    const VALUES = [idClasse];
+    const VALUES = [idClase];
 
     conn.query(sql, VALUES, (err, result) => {
       if (err) {
