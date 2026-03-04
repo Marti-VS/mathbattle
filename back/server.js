@@ -36,6 +36,12 @@ const { Server } = require("socket.io");
 const { log } = require("console");
 require('dotenv').config();
 
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 const io = new Server(server, {
   cors: {
     origin: "*",
